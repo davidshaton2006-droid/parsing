@@ -9,6 +9,8 @@
 - [Альфа Авто](https://davidshaton2006-droid.github.io/parsing/alfa-auto/)
 - [RIA-Service](https://davidshaton2006-droid.github.io/parsing/ria-service/)
 
+- [Чиж-Авто, React](https://davidshaton2006-droid.github.io/parsing/chizh-avto/)
+
 ## Структура
 
 ```
@@ -20,7 +22,7 @@ ria-service/index.html        # RIA-Service
 .nojekyll
 ```
 
-Каждый HTML-файл автономен: основные изображения включены в файл. Для публикации не нужны npm, Node.js или отдельная сборка.
+Большинство демо — автономные статические HTML-страницы. **Чиж-Авто** — отдельное полноценное React/Vite-приложение: GitHub Actions устанавливает зависимости, собирает клиентский bundle и проверяет основные интерактивные сценарии с помощью Playwright перед публикацией. Новые React/Vite-сайты следует добавлять с собственным процессом сборки, а не копировать исходный JSX в Pages.
 
 ## Включение Pages (один раз)
 
