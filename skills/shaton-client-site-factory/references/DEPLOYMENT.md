@@ -1,0 +1,55 @@
+# DEPLOYMENT.md — единый GitHub Pages для всех сайтов
+
+## Каноническое хранилище
+- GitHub: https://github.com/davidshaton2006-droid/parsing
+- Ветка: main
+- Публичный каталог: https://davidshaton2006-droid.github.io/parsing/
+- Процесс: GitHub Actions workflow .github/workflows/deploy-pages.yml -> GitHub Pages (Source: GitHub Actions)
+- **НЕ СОЗДАВАТЬ новый репозиторий для каждого сайта.**
+- Не заменять существующие три демо и не переписывать общее имя репозитория.
+- ОДНА GitHub Pages публикация, но отдельные URL-пути для каждого сайта — это не отдельные Pages-проекты или домены.
+
+## Уже известные сайты
+- GT Service — gt-service/index.html -> https://davidshaton2006-droid.github.io/parsing/gt-service/
+- Альфа Авто — alfa-auto/index.html -> https://davidshaton2006-droid.github.io/parsing/alfa-auto/
+- RIA-Service — ria-service/index.html -> https://davidshaton2006-droid.github.io/parsing/ria-service/
+
+## Как добавлять новый сайт
+1. Получи доступ к репозиторию, проверь текущую ветку, файлы, workflow и права.
+2. Сформируй короткий уникальный **slug** из латиницы, цифр и дефисов (пример: hardcore-barbershop). Не занимай существующий slug и не меняй старые.
+3. Создай /<slug>/index.html. При необходимости — /<slug>/assets/...; относительные ссылки должны работать именно из /parsing/<slug>/.
+4. Для HTML/vanilla JS избегай абсолютного пути /assets/, ведущего на корень домена: используй ./assets/... или корректный base path. Не забывай пути в CSS, JS и fetch.
+5. Обнови корневой /index.html: отдельная карточка с названием, нишей и ссылкой на новый /slug/. Явно помечай проекты как демонстрационные, если такие.
+6. Изменения в других каталогах должны отсутствовать, если не требуется общая инфраструктура.
+7. Коммит в main либо безопасный PR -> merge, согласно правам. Не коммить секреты/токены/конфиденциальные материалы.
+8. Убедись, что workflow реагирует на **любой push в main** (не содержит белого списка только из gt-service/alfa-auto/ria-service).
+9. Дождись успешного workflow. Проверь https://davidshaton2006-droid.github.io/parsing/<slug>/ и изображение, форму, меню, ссылки, mobile viewport.
+10. Только после публичной проверки сообщи «сайт опубликован».
+
+## Инфраструктура
+Файл .github/workflows/deploy-pages.yml использует:
+- actions/checkout
+- actions/configure-pages
+- actions/upload-pages-artifact с path: .
+- actions/deploy-pages
+- permissions: contents: read, pages: write, id-token: write
+- environment: github-pages
+- concurrency для деплоя
+
+GitHub Pages Settings -> Build and deployment -> Source **GitHub Actions**.
+Не переключать на branch /docs без осознанного изменения инфраструктуры.
+Стандартный Pages — это статический хостинг: нет Node/SSR, баз данных, постоянного backend или секретных API. Для backend нужен отдельный согласованный сервис; нельзя «имитировать» настоящий приём заявки.
+В дальнейшем при необходимости можно оптимизировать upload так, чтобы не включать служебные файлы, но не нарушать действующий деплой.
+
+## Обработка ошибок
+- **Configure Pages / Get Pages site failed / HttpError: Not Found**: проверить, существует ли Pages site и установлен ли Source=GitHub Actions в Settings -> Pages. Не пытаться менять дизайн HTML: это конфигурация Pages.
+- **pages artifact not found**: проверить шаг upload-pages-artifact, path, порядок jobs и имя артефакта.
+- **403 permission / forbidden**: проверить Actions permissions, pages:write, id-token:write, окружение github-pages, ограничения репозитория/организации.
+- **workflow не стартует после добавления нового сайта**: проверить фильтр on.push.paths; ранее он перечислял ровно три папки и потому не срабатывал на новые.
+- **404 на /slug/**: убедиться в наличии slug/index.html в опубликованном артефакте, что завершён последующий deploy, путь/регистр точны.
+- **главная есть, а картинки/JS отсутствуют**: исправить абсолютные пути (/assets/), относительные URL и base path /parsing/.
+- **ошибки Jekyll**: .nojekyll уже предусмотрен; не удалять без причины.
+- **не загружается страница**: проверить статус Actions и фактический URL, не полагаться лишь на заголовок run.
+
+## Портативность
+Если другой агент не подключён к GitHub, передай ему SKILL.md+references, исходники конкретного сайта и право/способ публикации. Он обязан сказать, что работа подготовлена локально, пока не подтвердит upload/deploy. Указанный URL — шаблон, а не доказательство фактической публикации.
