@@ -3,13 +3,6 @@ name: Deploy client previews to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'index.html'
-      - 'gt-service/**'
-      - 'alfa-auto/**'
-      - 'ria-service/**'
-      - '.nojekyll'
-      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
