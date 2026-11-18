@@ -1,0 +1,28 @@
+{
+  "name": "chizh-auto-flagship",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "sync:official": "node scripts/sync-official.mjs",
+    "test:e2e": "playwright test",
+    "check:static": "node scripts/check-static.mjs",
+    "check:factual": "node scripts/factual-audit.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "cheerio": "^1.0.0",
+    "embla-carousel-react": "^8.6.0",
+    "lucide-react": "^0.468.0",
+    "motion": "^12.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": "^6.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}
