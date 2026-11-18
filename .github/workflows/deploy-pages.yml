@@ -1,4 +1,4 @@
-name: Deploy client previews to GitHub Pages
+name: Build and deploy client preview websites
 
 on:
   push:
@@ -17,18 +17,93 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
+      - name: Check out full repository
         uses: actions/checkout@v4
-      - name: Configure Pages
+
+      - name: Prepare Node.js for the Chizh-Avto React site
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Chizh-Avto dependencies
+        working-directory: chizh-avto
+        run: npm install --no-audit --no-fund
+
+      - name: Verify functional controls and original-source content rules
+        working-directory: chizh-avto
+        run: |
+          npm run check:static
+          npm run check:factual
+
+      - name: Sync public factual directory from chizhavto.ru
+        working-directory: chizh-avto
+        env:
+          CHIZH_MAX_PAGES: '400'
+        run: |
+          timeout 330s npm run sync:official || echo "Official data refresh unavailable; using reviewed fallback"
+          npm run check:factual
+
+      - name: Build Chizh-Avto React application
+        working-directory: chizh-avto
+        run: |
+          npm run build
+          test -s dist/index.html
+
+      - name: Install Chromium browser for interaction tests
+        working-directory: chizh-avto
+        run: npx playwright install --with-deps chromium
+
+      - name: Test all major website actions (desktop and mobile)
+        working-directory: chizh-avto
+        run: npm run test:e2e
+
+      - name: Preserve test diagnostics if a test fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chizh-avto-e2e-diagnostics
+          path: |
+            chizh-avto/playwright-report
+            chizh-avto/test-results
+          retention-days: 5
+          if-no-files-found: ignore
+
+      - name: Assemble clean multi-site Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cp index.html _site/index.html
+          cp .nojekyll _site/.nojekyll
+          for folder in */; do
+            slug="${folder%/}"
+            if [[ "${slug}" == "chizh-avto" || "${slug}" == "_site" ]]; then continue; fi
+            if [[ -f "${slug}/index.html" ]]; then
+              cp -a "${slug}" "_site/${slug}"
+            fi
+          done
+          mkdir -p _site/chizh-avto
+          cp -a chizh-avto/dist/. _site/chizh-avto/
+          test -s _site/chizh-avto/index.html
+          test -s _site/gt-service/index.html
+          test -s _site/alfa-auto/index.html
+          test -s _site/ria-service/index.html
+          echo 'GitHub Pages artifact ready:'
+          find _site -maxdepth 2 -name index.html -print
+
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
+
+      - name: Upload clean site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
-      - name: Deploy to Pages
+          path: _site
+
+      - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
