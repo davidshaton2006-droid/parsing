@@ -13,7 +13,7 @@ test('ST CAR: approved concept structure, services and source accuracy',async({p
   await expect(page.locator('.facts-strip')).toContainText('5,0');
   await expect(page.locator('.real-gallery img')).toHaveCount(3);
   await expect(page.locator('.extended-list button')).toHaveCount(12);
-  await expect(page.locator('.hero-proof')).toContainText('452 оценки');
+  await expect(page.locator('.hero-proof')).toContainText('Более 450 оценок');
   await expect(page.locator('.review-card')).toHaveCount(3);
   await expect(page.locator('a[href="tel:+79186549999"]').first()).toBeAttached();
   await expect(page.locator('a[href*="25853057069"]').first()).toBeAttached();
