@@ -100,3 +100,20 @@
 @media(max-width:860px){.sv5-contacts-page .sc-contact-side{display:flex;flex-direction:column}.sv5-contacts-page .sv5-office-map{grid-column:auto}}
 @media(max-width:720px){.sv5-price-page{padding:34px 0 70px}.sv5-price-tools{padding:14px;border-radius:23px;gap:13px}.sv5-price-tools .sv5-price-search,.sv5-price-choice select{height:56px;min-height:56px}.sv5-price-page .sv5-price-entry{grid-template-columns:1fr;gap:16px;padding:19px 17px;border-radius:19px}.sv5-price-category{font-size:9px}.sv5-price-values{grid-template-columns:repeat(2,minmax(0,1fr))}.sv5-price-value{padding:13px}.sv5-price-value>span{font-size:10px}.sv5-price-value>strong{font-size:15px}.sv5-price-page .sv5-price-footer{padding:23px;border-radius:19px}.sv5-office-list{grid-template-columns:1fr 1fr}.sv5-contacts-page{padding-top:36px;padding-bottom:68px}.sv5-contacts-page .sv5-contact-panel{border-radius:23px;padding:29px 19px}.sv5-contacts-page .sv5-office-map{height:300px}.sv5-contacts-page .sv5-form-requested{grid-template-columns:1fr}.sv5-office-links a{font-size:11px}}
 @media(max-width:440px){.sv5-office-list{grid-template-columns:1fr}.sv5-contacts-page .sv5-office{padding:20px}.sv5-price-values{grid-template-columns:1fr}.sv5-price-tools .sv5-price-search{gap:7px;padding:0 10px}.sv5-price-search input{font-size:12px}.sv5-price-search span{font-size:10px}.sv5-office-details{padding:22px}.sv5-office-links{flex-direction:column;align-items:stretch}.sv5-office-links a{justify-content:center}}
+
+
+/* Contrast and resilient maps: never show a blank external widget placeholder. */
+.sv5-office-heading>h2{color:#fff6e6}
+.sv5-office-heading>p{color:#bdc1b7}
+.sv5-office-heading>span{color:#f6bb60}
+.sv5-office-map{min-height:310px;isolation:isolate}
+.sv5-map-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(circle at 50% 55%,#57402480 0%,#272820 45%,#181b16 100%);color:#f8ead5;overflow:hidden}
+.sv5-map-placeholder:before,.sv5-map-placeholder:after{content:"";position:absolute;inset:auto;width:290px;height:290px;border:1px solid #a78b5a40;border-radius:50%;pointer-events:none}
+.sv5-map-placeholder:after{width:190px;height:190px;border-color:#d2a05550}
+.sv5-map-placeholder>svg{position:relative;color:#f4b448;z-index:1}
+.sv5-map-placeholder strong{position:relative;font:850 clamp(25px,2.7vw,36px)/1.12 var(--sc-font);letter-spacing:-.05em;z-index:1}
+.sv5-map-placeholder span{position:relative;color:#d8d4c9;font-size:13px;z-index:1}
+.sv5-map-placeholder button{position:relative;z-index:1;margin-top:10px;border:1px solid #d4a457;background:#f3ad43;color:#171912;padding:13px 20px;border-radius:100px;font-size:13px;font-weight:850;display:flex;gap:12px;align-items:center;cursor:pointer}
+.sv5-map-placeholder button:hover{background:#ffcb75}
+.sv5-office-map.is-loaded{background:#e6e2d7}
+.sv5-office-map .sv5-map-link{bottom:12px;left:12px;z-index:2}
