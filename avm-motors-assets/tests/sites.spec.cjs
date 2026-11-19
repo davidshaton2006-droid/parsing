@@ -44,6 +44,48 @@ for(const slug of ['avm-motors-red','avm-motors-heritage']){
       await page.keyboard.press('Escape');
       await expect(page.locator('[data-lightbox]')).toBeHidden();
     });
+
+    test('premium UI, command search, brand-prefilled enquiry',async({page})=>{
+      const errors=[];page.on('pageerror',e=>errors.push(e.message));
+      await page.goto('/'+slug+'/',{waitUntil:'domcontentloaded'});
+      await expect(page.locator('[data-progress]')).toHaveCount(0);
+      await expect(page.locator('[data-command]')).toBeHidden();
+      await page.keyboard.press('Control+k');
+      await expect(page.locator('[data-command]')).toBeVisible();
+      await page.locator('[data-command-input]').fill('DSG');
+      await expect(page.locator('.command-result')).toHaveCount(1);
+      await page.locator('.command-result').click();
+      await expect(page.locator('[data-command]')).toBeHidden();
+      await expect(page.locator('[data-modal]')).toBeVisible();
+      await expect(page.locator('[data-service-choice]')).toHaveValue(/DSG/);
+      await page.keyboard.press('Escape');
+      await page.locator('[data-vehicle="Audi"]').click();
+      await expect(page.locator('[data-modal]')).toBeVisible();
+      await expect(page.locator('[data-car]')).toHaveValue(/Audi/);
+      await page.keyboard.press('Escape');
+      expect(errors).toEqual([]);
+    });
+    test('no headline clipping or horizontal overflow at several widths',async({page})=>{
+      await page.goto('/'+slug+'/',{waitUntil:'domcontentloaded'});
+      for(const width of [320,360,390,428,768,1024,1440]){
+        await page.setViewportSize({width,height:900});
+        const metrics=await page.evaluate(()=>{
+          const root=document.documentElement;
+          const word=document.querySelector('.hero-title .red');
+          const panel=document.querySelector('.hero-copy');
+          const w=word?.getBoundingClientRect();
+          const p=panel?.getBoundingClientRect();
+          return {documentWidth:root.scrollWidth,viewportWidth:innerWidth,
+            headline:word?{text:word.textContent,whiteSpace:getComputedStyle(word).whiteSpace,right:w.right,panelRight:p.right}:null};
+        });
+        expect(metrics.documentWidth,'document overflow at '+width).toBeLessThanOrEqual(metrics.viewportWidth+3);
+        if(slug==='avm-motors-red'){
+          expect(metrics.headline.text).toContain('ДИАГНОСТИРОВАТЬ');
+          expect(metrics.headline.whiteSpace).toBe('nowrap');
+          expect(metrics.headline.right,'clipped word at '+width).toBeLessThanOrEqual(metrics.headline.panelRight+2);
+        }
+      }
+    });
     test('responsive menu and anchor navigation',async({page},testInfo)=>{
       await page.goto('/'+slug+'/',{waitUntil:'domcontentloaded'});
       if(testInfo.project.name==='mobile-chromium'){
