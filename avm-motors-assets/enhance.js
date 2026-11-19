@@ -11,7 +11,7 @@ function applyFilters(){if(!list)return;const active=$('[data-filter][aria-press
 $$('[data-filter]').forEach(b=>b.addEventListener('click',()=>{$$('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));applyFilters();}));
 search?.addEventListener('input',applyFilters);applyFilters();
 const modal=$('[data-modal]'),form=$('[data-form]'),first=$('[data-name]'),chosen=$('[data-service-choice]'),feedback=$('[data-form-feedback]');
-const openModal=(service='')=>{if(!modal)return;state.modalFocus=doc.activeElement;modal.hidden=false;doc.body.classList.add('is-locked');if(chosen)chosen.value=service||'';if(feedback)feedback.textContent='';requestAnimationFrame(()=>first?.focus());};
+const openModal=(service='')=>{if(!modal)return;state.modalFocus=doc.activeElement;modal.hidden=false;doc.body.classList.add('is-locked');if(chosen){const value=service||'';if(value&&![...chosen.options].some(o=>o.value===value)){const o=doc.createElement('option');o.value=value;o.textContent=value;chosen.appendChild(o);}chosen.value=value;}if(feedback)feedback.textContent='';requestAnimationFrame(()=>first?.focus());};
 function closeModal(){if(!modal)return;modal.hidden=true;doc.body.classList.remove('is-locked');state.modalFocus?.focus?.();}
 $$('[data-open-form]').forEach(btn=>btn.addEventListener('click',()=>openModal(btn.dataset.openForm||'')));
 $$('[data-close-form]').forEach(btn=>btn.addEventListener('click',closeModal));
@@ -28,7 +28,7 @@ const symptom=$('[data-symptom-result]');const advice={
 };
 $$('[data-symptom]').forEach(btn=>btn.addEventListener('click',()=>{const item=advice[btn.dataset.symptom];if(!item||!symptom)return;$$('[data-symptom]').forEach(x=>x.setAttribute('aria-pressed',String(x===btn)));symptom.innerHTML='';const title=doc.createElement('h3'),p=doc.createElement('p'),action=doc.createElement('button');title.textContent=item.title;p.textContent=item.text;action.type='button';action.className='button button-primary';action.textContent='Уточнить обслуживание ↗';action.addEventListener('click',()=>openModal(item.service));symptom.append(title,p,action);}));
 const lightbox=$('[data-lightbox]'),lightImg=$('[data-lightbox-image]'),lightCap=$('[data-lightbox-caption]');
-const gallery=$$('[data-photo]');function displayPhoto(index){if(!gallery.length||!lightbox)return;state.lightIndex=(index+gallery.length)%gallery.length;const item=gallery[state.lightIndex];const img=$('img',item);lightImg.src=img.dataset.full||img.src;lightImg.alt=img.alt;lightCap.textContent=(item.dataset.caption||img.alt)+' · '+(state.lightIndex+1)+' / '+gallery.length;}
+const gallery=$$('[data-photo]');function displayPhoto(index){if(!gallery.length||!lightbox)return;state.lightIndex=(index+gallery.length)%gallery.length;const item=gallery[state.lightIndex];const img=$('img',item);lightImg.src=(img.complete&&img.naturalWidth>0?img.currentSrc:(img.dataset.full||img.src));lightImg.alt=img.alt;lightCap.textContent=(item.dataset.caption||img.alt)+' · '+(state.lightIndex+1)+' / '+gallery.length;}
 function openLight(index){state.modalFocus=doc.activeElement;displayPhoto(index);lightbox.hidden=false;doc.body.classList.add('is-locked');$('[data-close-lightbox]')?.focus();}
 function closeLight(){if(!lightbox)return;lightbox.hidden=true;doc.body.classList.remove('is-locked');state.modalFocus?.focus?.();}
 gallery.forEach((item,i)=>item.addEventListener('click',()=>openLight(i)));
@@ -41,5 +41,5 @@ doc.addEventListener('keydown',e=>{
   if(lightbox&&!lightbox.hidden){if(e.key==='ArrowLeft')displayPhoto(state.lightIndex-1);if(e.key==='ArrowRight')displayPhoto(state.lightIndex+1);}
   const activeDialog=lightbox&&!lightbox.hidden?lightbox:(modal&&!modal.hidden?modal:null);if(e.key==='Tab'&&activeDialog){const f=$$('button:not([disabled]),a[href],input:not([disabled]),select,textarea',activeDialog).filter(x=>x.offsetParent!==null);if(!f.length)return;const i=f.indexOf(doc.activeElement);if(e.shiftKey&&i===0){e.preventDefault();f.at(-1).focus();}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();}}
 });
-$$('[data-image-fallback]').forEach(img=>img.addEventListener('error',()=>{if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.imageFallback;}));
+$('[data-image-fallback]').forEach(img=>{const fallback=()=>{if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.imageFallback;};img.addEventListener('error',fallback);if(img.complete&&img.naturalWidth===0)fallback();});
 })();
