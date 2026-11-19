@@ -202,7 +202,7 @@ const chizhOffices=[
 ];
 function ContactsPage(){
  const params=new URLSearchParams(location.hash.split('?')[1]||'');
- const [officeIndex,setOfficeIndex]=useState(0);
+ const [officeIndex,setOfficeIndex]=useState(0);const [mapOpen,setMapOpen]=useState(false);
  const [form,setForm]=useState(()=>({name:'',phone:'',service:params.get('service')||'',car:'',note:'',requestedDate:params.get('date')||'',requestedTime:params.get('time')||''}));
  const [message,setMessage]=useState('');
  const office=chizhOffices[officeIndex];
@@ -216,7 +216,7 @@ function ContactsPage(){
    <div className="sc-contact-side">
     <div className="sv5-office-heading"><span>НАШИ АДРЕСА</span><h2>Выберите филиал</h2><p>Телефон, email и режим работы взяты с официального сайта компании.</p></div>
     <div className="sv5-office-list" role="group" aria-label="Выбор филиала Чиж-Авто">
-     {chizhOffices.map((item,i)=><button key={item.id} type="button" className={'sc-contact-address sv5-office'+(officeIndex===i?' is-active':'')} onClick={()=>setOfficeIndex(i)} aria-pressed={officeIndex===i}>
+     {chizhOffices.map((item,i)=><button key={item.id} type="button" className={'sc-contact-address sv5-office'+(officeIndex===i?' is-active':'')} onClick={()=>{setOfficeIndex(i);setMapOpen(false)}} aria-pressed={officeIndex===i}>
       <span>{String(i+1).padStart(2,'0')} / КРАСНОДАР</span><h3>{item.label}</h3><p>{facts.hours}</p><span className="sv5-office-select">{officeIndex===i?'Выбранный филиал':'Выбрать филиал'} <ArrowUpRight size={17}/></span>
      </button>)}
     </div>
@@ -225,13 +225,17 @@ function ContactsPage(){
      <div className="sv5-office-links"><a href={'tel:'+facts.tel}><Phone size={18}/>{facts.phone}</a><a href={'mailto:'+facts.email}><Mail size={18}/>{facts.email}</a></div>
      <a className="sv5-route-button" href={office.map} target="_blank" rel="noopener noreferrer">Построить маршрут в Яндекс Картах <ArrowUpRight size={19}/></a>
     </div>
-    <div className="sc-map sv5-office-map"><iframe key={office.id} title={'Расположение Чиж-Авто: '+office.label} loading="lazy" src={office.embed} referrerPolicy="strict-origin-when-cross-origin"/><a href={office.map} target="_blank" rel="noopener noreferrer" className="sv5-map-link">Открыть карту <ArrowUpRight size={15}/></a></div>
+    <div className={'sc-map sv5-office-map'+(mapOpen?' is-loaded':'')}>
+     {mapOpen?<iframe key={office.id} title={'Расположение Чиж-Авто: '+office.label} loading="lazy" src={office.embed} referrerPolicy="strict-origin-when-cross-origin"/>:
+      <div className="sv5-map-placeholder"><MapPin size={32}/><strong>{office.label}</strong><span>Краснодар</span><button type="button" onClick={()=>setMapOpen(true)}>Показать карту <ArrowUpRight size={17}/></button></div>}
+     <a href={office.map} target="_blank" rel="noopener noreferrer" className="sv5-map-link">Маршрут в Яндекс Картах <ArrowUpRight size={15}/></a>
+    </div>
    </div>
    <div className="sc-contact-form sv5-contact-panel">
     <Eyebrow>Консультация</Eyebrow><h2>Обсудим ваш автомобиль.</h2>
     <p>Подготовим письмо с вашими пожеланиями и данными автомобиля. Отправка происходит в почтовой программе; автоматической записи здесь нет.</p>
     <form onSubmit={mail}>
-     <label>Филиал<select aria-label="Предпочтительный филиал" value={office.id} onChange={e=>setOfficeIndex(Math.max(0,chizhOffices.findIndex(x=>x.id===e.target.value)))}>{chizhOffices.map(x=><option key={x.id} value={x.id}>{x.address}</option>)}</select></label>
+     <label>Филиал<select aria-label="Предпочтительный филиал" value={office.id} onChange={e=>{setOfficeIndex(Math.max(0,chizhOffices.findIndex(x=>x.id===e.target.value)));setMapOpen(false)}}>{chizhOffices.map(x=><option key={x.id} value={x.id}>{x.address}</option>)}</select></label>
      <label>Имя *<input required maxLength="80" autoComplete="name" value={form.name} onChange={e=>update('name',e.target.value)} placeholder="Ваше имя"/></label>
      <label>Телефон *<input required minLength="7" maxLength="30" inputMode="tel" type="tel" autoComplete="tel" value={form.phone} onChange={e=>update('phone',e.target.value)} placeholder="+7 (999) 000-00-00"/></label>
      <label>Что хотите сделать?<select value={form.service} onChange={e=>update('service',e.target.value)}><option value="">Нужна консультация</option>{groups.map(x=><option key={x.id} value={x.name}>{x.name}</option>)}</select></label>
