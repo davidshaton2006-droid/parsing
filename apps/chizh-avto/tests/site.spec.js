@@ -88,7 +88,7 @@ test('Mobile navigation is usable and page has no horizontal overflow',async({pa
  expect(overflow).toBeLessThanOrEqual(2);
 });
 
-test('Review real screenshot of concept 5 across breakpoints',async({page},testInfo})=>{
+test('Review real screenshot of concept 5 across breakpoints',async({page},testInfo)=>{
  await route(page);
  await expect.poll(()=>page.locator('.sv5-hero-media img').first().evaluate(n=>n.naturalWidth),{timeout:15000}).toBeGreaterThan(0);
  // Walk viewport to trigger lazy images before taking the full document screenshot.
