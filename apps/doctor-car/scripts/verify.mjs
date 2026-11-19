@@ -1,0 +1,17 @@
+import {readFile,access} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const app=await readFile(new URL('../src/main.jsx',import.meta.url),'utf8');
+const css=await readFile(new URL('../src/style.css',import.meta.url),'utf8');
+const index=await readFile(new URL('../index.html',import.meta.url),'utf8');
+const data=await readFile(new URL('../src/data.js',import.meta.url),'utf8');
+const blueprint=await readFile(new URL('../src/CarBlueprint.jsx',import.meta.url),'utf8');
+for(const key of ['function App()','function Home(','function ServicesPage(','function WorkPage(','function PricesPage(','function ContactPage(','function Inquiry(','function FAQSection('])assert(app.includes(key),'Missing '+key);
+for(const key of ['aria-expanded','onClick','onChange','aria-pressed','type="search"','role="dialog"','navigator.clipboard','tel:','setMapOpen'])assert(app.includes(key),'Missing interaction '+key);
+assert(app.includes('localStorage.setItem')&&css.includes('[data-theme="light"]'),'Both themes must work');
+assert(blueprint.includes('onPick?.')&&blueprint.includes('role="group"'),'Interactive blueprint missing');
+assert(!app.includes('unsplash')&&!app.includes('pexels')&&!app.includes('pixabay'),'Stock imagery forbidden');
+assert(index.includes('src="/src/main.jsx"')&&index.includes('<main>'),'No-JS fallback must exist');
+assert(data.includes('Жлобы, 24')&&data.includes('114732639406'),'Grounded address and original Yandex URL required');
+assert(!css.includes('content-visibility:auto')&&!css.includes('scroll-progress'),'No delayed full-section rendering/progress bars');
+await access(new URL('../dist/index.html',import.meta.url));
+console.log('Doctor Car static/production checks passed.');
