@@ -121,28 +121,131 @@ function Home(){return <><Hero/><ServiceIndex/><Portfolio/><StudioInfo/><Reel/><
 function PageIntro({kicker,title,desc,count}){return <section className="sc-page-intro"><div className="sc-wrap"><div className="sc-page-topline"><SiteLink to="/">Главная</SiteLink><ChevronRight size={13}/><span>{kicker}</span></div><div className="sc-page-heading"><div><Eyebrow>{kicker}</Eyebrow><h1>{title}</h1></div><div>{desc&&<p>{desc}</p>}{count&&<span className="sc-page-count">{count}</span>}</div></div></div></section>}
 function ServicesPage(){return <><PageIntro kicker="Услуги" title="Что можно улучшить." desc="Двенадцать направлений дооснащения и подробные услуги из каталога компании." count="12 / НАПРАВЛЕНИЙ"/><ServiceIndex full/><div className="sc-wrap sc-bottom-booking"><Booking/></div></>}
 function ProjectsPage(){const snap=useSnapshot(true);return <><PageIntro kicker="Портфолио" title="Сделано в Чиж-Авто." desc="Проекты и фотографии из открытых материалов компании. Откройте любую работу и перейдите к первоисточнику."/><Portfolio full snapshot={snap}/><div className="sc-wrap sc-bottom-booking"><Booking/></div></>}
-function PricesPage(){const snap=useSnapshot(true),[q,setQ]=useState(''),[showAll,setShowAll]=useState(false);
- const all=snap.priceRows?.length?snap.priceRows.map((row,i)=>({id:i,name:row[0],values:row.slice(1)})):prices.map(([name,value],i)=>({id:i,name,values:[value]}));
- const filtered=all.filter(x=>x.name.toLowerCase().includes(q.trim().toLowerCase()));const shown=showAll?filtered:filtered.slice(0,35);
- return <><PageIntro kicker="Прайс" title="Стоимость работ." desc="Цены опубликованы компанией, но могут меняться. Итог зависит от автомобиля и выбранного оборудования."/><section className="sc-price-section"><div className="sc-wrap"><div className="sc-search"><Search size={18}/><input value={q} onChange={e=>{setQ(e.target.value);setShowAll(false)}} type="search" aria-label="Поиск по прайс-листу" placeholder="Поиск по названию услуги"/><span>{filtered.length} позиций</span></div><div className="sc-price-list">{shown.map(row=><div key={row.id} className="sc-price-row"><span>{row.name}</span><div>{row.values.filter(Boolean).map((v,i)=><b key={i}>{v}</b>)}</div></div>)}</div>{filtered.length>shown.length&&<button className="sc-more dark" onClick={()=>setShowAll(true)}>Показать оставшиеся {filtered.length-shown.length} позиций <Plus size={19}/></button>}{filtered.length===0&&<p className="sc-empty">Совпадений нет. <button onClick={()=>setQ('')}>Сбросить поиск</button></p>}<div className="sc-price-footer"><p>Актуальные цены, комплектация и состав работ согласовываются с центром. Если указано несколько значений, это варианты стоимости из исходного прайса.</p><Out to={ORIGIN+'/prices/'} className="sc-inline-cta">Оригинальный прайс <ArrowUpRight size={17}/></Out></div></div></section><div className="sc-wrap sc-bottom-booking"><Booking/></div></>}
+// Prices from the official price list: multiple columns are not equivalent.
+// Keep their actual headings instead of showing unlabeled, misleading amounts.
+const priceMoney=value=>/₽|руб\.?|по запросу|договорн|уточняйте|бесплатно/i.test(String(value||''));
+const vehicleClasses=['Седаны малого и среднего класса','Седаны бизнес-класса и кроссоверы','Седаны премиум-класса и внедорожники','Минивэны и микроавтобусы'];
+function normalizePriceRows(snapshot){
+ const src=snapshot?.priceRows?.length?snapshot.priceRows:prices.map(([name,value])=>[name,value]);
+ let headers=[], section='Услуги';
+ const results=[];
+ for(const [index,item] of src.entries()){
+  if(!Array.isArray(item))continue;
+  const cells=item.map(x=>String(x??'').trim()).filter(Boolean);
+  if(!cells.length)continue;
+  const [name,...values]=cells;
+  if(!values.length){section=name;continue}
+  const isHeading=values.every(v=>!priceMoney(v)) &&
+   (values.some(v=>/седаны|кроссовер|внедорож|минивэн|цена|стоимость|работы|установкой/i.test(v))||!priceMoney(name));
+  if(isHeading){
+   if(/^(услуга|наименование)$/i.test(name))continue;
+   section=name;
+   headers=values;
+   continue;
+  }
+  if(/^(услуга|наименование|стоимость)$/i.test(name))continue;
+  const clean=values.filter(v=>priceMoney(v));
+  if(!clean.length)continue;
+  const isVehicle=clean.length===4 && headers.length===4 &&
+   headers.some(h=>/седаны|кроссовер|внедорож|минивэн/i.test(h));
+  const pricesList=clean.map((value,i)=>({value,label:isVehicle?headers[i]:(headers.length===clean.length?headers[i]:clean.length===1?'Стоимость':('Вариант '+(i+1)))}));
+  results.push({id:index,name,section,values:pricesList,isVehicle});
+ }
+ return results;
+}
+function PricesPage(){
+ const snap=useSnapshot(true);
+ const [q,setQ]=useState('');
+ const [showAll,setShowAll]=useState(false);
+ const [car,setCar]=useState('all');
+ const all=useMemo(()=>normalizePriceRows(snap),[snap]);
+ const term=q.trim().toLocaleLowerCase('ru');
+ const filtered=all.filter(x=>(x.name+' '+x.section).toLocaleLowerCase('ru').includes(term));
+ const shown=showAll?filtered:filtered.slice(0,32);
+ return <>
+  <PageIntro kicker="Прайс-лист Чиж-Авто" title="Цены на услуги." desc="Без смешения классов автомобилей: каждый вариант стоимости подписан. Окончательная цена зависит от модели, комплектации и состава работ."/>
+  <section className="sc-price-section sv5-price-page"><div className="sc-wrap">
+   <div className="sv5-price-tools">
+    <label className="sc-search sv5-price-search"><Search size={19}/><input value={q} onChange={e=>{setQ(e.target.value);setShowAll(false)}} type="search" aria-label="Поиск по прайс-листу" placeholder="Найти услугу или направление"/><span aria-live="polite">{filtered.length} позиций</span></label>
+    <label className="sv5-price-choice">Класс автомобиля
+     <select aria-label="Класс автомобиля для отображения стоимости" value={car} onChange={e=>setCar(e.target.value)}>
+      <option value="all">Все классы</option>
+      {vehicleClasses.map((n,i)=><option key={i} value={String(i)}>{n}</option>)}
+     </select>
+    </label>
+   </div>
+   <p className="sv5-price-explainer">Для услуг с разной ценой по классу автомобиля выберите свой класс. Остальные позиции показываются по исходному прайсу с расшифровкой вариантов.</p>
+   <div className="sv5-price-results">
+    {shown.map(row=>{
+     const selected=row.isVehicle&&car!=='all'?[row.values[Number(car)]].filter(Boolean):row.values;
+     return <article className="sc-price-row sv5-price-entry" key={row.id}>
+      <div className="sv5-price-description"><span className="sv5-price-category">{row.section}</span><h2>{row.name}</h2></div>
+      <div className={'sv5-price-values'+(row.isVehicle?' sv5-price-values-tiered':'')}>
+       {selected.map((v,i)=><div className="sv5-price-value" key={i}><span>{v.label}</span><strong>{v.value}</strong></div>)}
+      </div>
+     </article>;
+    })}
+   </div>
+   {filtered.length>shown.length&&<button className="sc-more dark sv5-price-more" onClick={()=>setShowAll(true)} type="button">Показать ещё {filtered.length-shown.length} позиций <Plus size={19}/></button>}
+   {filtered.length===0&&<div className="sc-empty sv5-empty-price">По такому запросу услуг не найдено. <button type="button" onClick={()=>setQ('')}>Очистить поиск</button></div>}
+   <div className="sc-price-footer sv5-price-footer"><p>Стоимость указана по открытому прайсу компании. Цены могут изменяться, особенно при подборе оборудования под конкретный автомобиль. Не является окончательной сметой.</p><Out to={ORIGIN+'/prices/'} className="sc-inline-cta">Сверить с оригинальным прайсом <ArrowUpRight size={17}/></Out></div>
+  </div></section>
+  <div className="sc-wrap sc-bottom-booking"><Booking/></div>
+ </>;
+}
+
 function AboutPage(){return <><PageIntro kicker="О компании" title="Мастерская возможностей." desc="Чиж-Авто — сертифицированный центр автомобильного тюнинга и установки дополнительного оборудования в Краснодаре."/><section className="sc-about-page sc-wrap"><div className="sc-about-hero-photo"><Photo src={PHOTO.gw} alt="Автомобиль в мастерской Чиж-Авто"/></div><div className="sc-about-columns"><div><Eyebrow>Более 20 лет опыта</Eyebrow><h2>Опыт — в каждой установке.</h2></div><div><p>Компания занимается установкой охранных систем, мультимедиа, автозвука, систем обзора и парковки, доработкой света, шумоизоляцией и защитой кузова.</p><p>В опубликованном портфолио представлены работы с автомобилями разных марок. Конкретную совместимость оборудования и условия установки уточняют сотрудники центра.</p><Out to={ORIGIN+'/company/'} className="sc-inline-cta">Подробнее на официальном сайте <ArrowUpRight size={18}/></Out></div></div></section><Reel/><Steps/><div className="sc-wrap sc-bottom-booking"><Booking/></div></>}
 function OffersPage(){const deals=[['Оклейка зон риска','Полировка и керамическое покрытие в подарок при заказе оклейки зон риска.'],['Шумоизоляция','Обработка арок в подарок при заказе шумоизоляции салона.'],['Гибридная антигравийная плёнка','Предложение об оклейке защитной плёнкой по специальной цене.']];return <><PageIntro kicker="Акции" title="Предложения центра." desc="Условия и сроки могут измениться. Перед оформлением заказа уточните актуальность акции в Чиж-Авто."/><section className="sc-offers sc-wrap"><div className="sc-offer-grid">{deals.map((d,i)=><div className="sc-offer" key={d[0]}><span>{pad(i+1)} / ИЗ АРХИВА ПРЕДЛОЖЕНИЙ</span><h2>{d[0]}</h2><p>{d[1]}</p><Out to={ORIGIN+'/shares/'} className="sc-inline-cta">Проверить условия <ArrowUpRight size={18}/></Out></div>)}</div><p className="sc-offers-note">Эти предложения упоминались на официальном сайте. Активность, даты и условия необходимо подтвердить у компании.</p></section><div className="sc-wrap sc-bottom-booking"><Booking/></div></>}
+const chizhOffices=[
+ {id:'zhloby',label:'Жлобы, 115',address:'Краснодар, ул. имени Жлобы, 115',map:'https://yandex.ru/maps/org/chizh_avto/1266081535/',embed:'https://yandex.ru/map-widget/v1/?oid=1266081535&z=16'},
+ {id:'kalyaeva',label:'Каляева, 89',address:'Краснодар, ул. Каляева, 89',map:'https://yandex.ru/maps/?text='+encodeURIComponent('Краснодар, улица Каляева, 89'),embed:'https://yandex.ru/map-widget/v1/?text='+encodeURIComponent('Краснодар, улица Каляева, 89')+'&z=16'}
+];
 function ContactsPage(){
- const [form,setForm]=useState(()=>{const p=new URLSearchParams(location.hash.split('?')[1]||'');return {name:'',phone:'',service:p.get('service')||'',car:'',note:'',requestedDate:p.get('date')||'',requestedTime:p.get('time')||''}});
- const [message,setMessage]=useState('');const update=(k,v)=>setForm(x=>({...x,[k]:v}));
- const text=()=>['Здравствуйте! Хочу уточнить услугу в Чиж-Авто.', 'Адрес: Жлобы, 115, Краснодар.', 'Имя: '+form.name,'Телефон: '+form.phone,'Услуга: '+(form.service||'Нужна консультация'),'Автомобиль: '+(form.car||'Не указан'),'Желаемая дата: '+(form.requestedDate||'Не указана'),'Желаемое время: '+(form.requestedTime||'Не указано'),'Комментарий: '+(form.note||'Нет'),'Дата и время являются пожеланием, запись требует подтверждения.'].join('\n');
- const mail=e=>{e.preventDefault();if(!e.currentTarget.reportValidity())return;setMessage('Открываем ваше почтовое приложение. Отправьте письмо вручную; заявка и запись не подтверждаются.');location.href='mailto:'+facts.email+'?subject='+encodeURIComponent('Запрос с демонстрационного сайта')+'&body='+encodeURIComponent(text())};
- const copy=async()=>{try{await navigator.clipboard.writeText(text());setMessage('Текст обращения скопирован. Отправьте его по официальным контактам.')}catch{setMessage('Скопировать автоматически не удалось. Используйте email или телефон.')}};
- return <><PageIntro kicker="Контакты" title="Есть задача? Обсудим." desc="Два адреса в Краснодаре. Свяжитесь с центром напрямую, чтобы уточнить услугу, стоимость и время визита."/><section className="sc-contacts sc-wrap"><div className="sc-contact-side"><div className="sc-contact-address"><span>01 / ОСНОВНАЯ ТОЧКА</span><h2>Жлобы, 115</h2><p>Краснодар · ежедневно, 09:00–18:00</p><div><a href={'tel:'+facts.tel}><Phone size={17}/>{facts.phone}</a><Out to={facts.map}>Яндекс Карты <ArrowUpRight size={17}/></Out></div></div><div className="sc-contact-address"><span>02 / ВТОРАЯ ТОЧКА</span><h2>Каляева, 89</h2><p>Краснодар · ежедневно, 09:00–18:00</p><div><a href={'tel:'+facts.tel}><Phone size={17}/>{facts.phone}</a><Out to={ORIGIN+'/contacts/'}>Контакты филиала <ArrowUpRight size={17}/></Out></div></div><div className="sc-map"><iframe title="Чиж-Авто, Жлобы 115 на карте" loading="lazy" src="https://yandex.ru/map-widget/v1/?oid=1266081535&z=16" referrerPolicy="strict-origin-when-cross-origin"/></div></div>
- <div className="sc-contact-form"><Eyebrow>Обращение в центр</Eyebrow><h2>Расскажите, что нужно.</h2><p>Это неофициальный концепт. Форма подготовит письмо в вашем почтовом приложении, но сама ничего не отправляет и не создаёт запись.</p><form onSubmit={mail}>
- <label>Имя *<input required autoComplete="name" value={form.name} onChange={e=>update('name',e.target.value)} placeholder="Ваше имя"/></label>
- <label>Телефон *<input required minLength="6" type="tel" autoComplete="tel" value={form.phone} onChange={e=>update('phone',e.target.value)} placeholder="+7 999 000 00 00"/></label>
- <label>Услуга<select value={form.service} onChange={e=>update('service',e.target.value)}><option value="">Нужна консультация</option>{groups.map(x=><option key={x.id}>{x.name}</option>)}</select></label>
- <label>Ваш автомобиль<input value={form.car} onChange={e=>update('car',e.target.value)} placeholder="Марка, модель, год"/></label>
- <div className="sv5-form-requested"><label>Желаемая дата<input type="date" value={form.requestedDate} onChange={e=>update('requestedDate',e.target.value)}/></label><label>Желаемое время<select value={form.requestedTime} onChange={e=>update('requestedTime',e.target.value)}><option value="">Не выбрано</option>{['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'].map(t=><option key={t}>{t}</option>)}</select></label></div>
- <label>Комментарий<textarea value={form.note} onChange={e=>update('note',e.target.value)} rows="3" placeholder="Что хотелось бы установить или изменить?"/></label>
- <div className="sc-form-buttons"><button type="submit" className="sc-button">Открыть письмо <ArrowUpRight size={18}/></button><button type="button" className="sc-button outline" onClick={copy}>Скопировать текст <Copy size={17}/></button></div><div className="sc-form-status" role="status" aria-live="polite">{message}</div></form><p className="sc-form-note">Для реального приёма онлайн-заявок требуется подтверждённый канал обработки и соответствующие документы по персональным данным.</p>
- </div></section></>
+ const params=new URLSearchParams(location.hash.split('?')[1]||'');
+ const [officeIndex,setOfficeIndex]=useState(0);
+ const [form,setForm]=useState(()=>({name:'',phone:'',service:params.get('service')||'',car:'',note:'',requestedDate:params.get('date')||'',requestedTime:params.get('time')||''}));
+ const [message,setMessage]=useState('');
+ const office=chizhOffices[officeIndex];
+ const update=(k,v)=>setForm(x=>({...x,[k]:v}));
+ const body=()=>['Здравствуйте! Хочу уточнить услугу в Чиж-Авто.','Предпочтительный филиал: '+office.address,'Имя: '+form.name,'Телефон: '+form.phone,'Услуга: '+(form.service||'Нужна консультация'),'Автомобиль: '+(form.car||'Не указан'),'Желаемая дата: '+(form.requestedDate||'Не указана'),'Желаемое время: '+(form.requestedTime||'Не указано'),'Комментарий: '+(form.note||'Нет'),'Указанные дата и время — пожелание, запись требует подтверждения.'].join('\n');
+ const mail=e=>{e.preventDefault();if(!e.currentTarget.reportValidity())return;setMessage('Откроется почтовое приложение с подготовленным письмом. Нажмите «Отправить» в почте: сама страница заявку не отправляет.');window.location.href='mailto:'+facts.email+'?subject='+encodeURIComponent('Запрос Чиж-Авто: '+office.label)+'&body='+encodeURIComponent(body())};
+ const copy=async()=>{try{if(!navigator.clipboard?.writeText)throw Error('clipboard unavailable');await navigator.clipboard.writeText(body());setMessage('Текст обращения скопирован. Отправьте его на '+facts.email+' или сообщите по телефону.')}catch{setMessage('Скопировать не удалось. Позвоните или откройте письмо в почтовом приложении.')}};
+ return <>
+  <PageIntro kicker="Контакты" title="Приезжайте в Чиж-Авто." desc="Две точки в Краснодаре. Выберите нужный филиал, откройте маршрут или отправьте запрос на консультацию."/>
+  <section className="sc-contacts sc-wrap sv5-contacts-page">
+   <div className="sc-contact-side">
+    <div className="sv5-office-heading"><span>НАШИ АДРЕСА</span><h2>Выберите филиал</h2><p>Телефон, email и режим работы взяты с официального сайта компании.</p></div>
+    <div className="sv5-office-list" role="group" aria-label="Выбор филиала Чиж-Авто">
+     {chizhOffices.map((item,i)=><button key={item.id} type="button" className={'sc-contact-address sv5-office'+(officeIndex===i?' is-active':'')} onClick={()=>setOfficeIndex(i)} aria-pressed={officeIndex===i}>
+      <span>{String(i+1).padStart(2,'0')} / КРАСНОДАР</span><h3>{item.label}</h3><p>{facts.hours}</p><span className="sv5-office-select">{officeIndex===i?'Выбранный филиал':'Выбрать филиал'} <ArrowUpRight size={17}/></span>
+     </button>)}
+    </div>
+    <div className="sv5-office-details">
+     <div className="sv5-office-address-line"><MapPin size={21}/><div><span>АДРЕС</span><strong>{office.address}</strong></div></div>
+     <div className="sv5-office-links"><a href={'tel:'+facts.tel}><Phone size={18}/>{facts.phone}</a><a href={'mailto:'+facts.email}><Mail size={18}/>{facts.email}</a></div>
+     <a className="sv5-route-button" href={office.map} target="_blank" rel="noopener noreferrer">Построить маршрут в Яндекс Картах <ArrowUpRight size={19}/></a>
+    </div>
+    <div className="sc-map sv5-office-map"><iframe key={office.id} title={'Расположение Чиж-Авто: '+office.label} loading="lazy" src={office.embed} referrerPolicy="strict-origin-when-cross-origin"/><a href={office.map} target="_blank" rel="noopener noreferrer" className="sv5-map-link">Открыть карту <ArrowUpRight size={15}/></a></div>
+   </div>
+   <div className="sc-contact-form sv5-contact-panel">
+    <Eyebrow>Консультация</Eyebrow><h2>Обсудим ваш автомобиль.</h2>
+    <p>Подготовим письмо с вашими пожеланиями и данными автомобиля. Отправка происходит в почтовой программе; автоматической записи здесь нет.</p>
+    <form onSubmit={mail}>
+     <label>Филиал<select aria-label="Предпочтительный филиал" value={office.id} onChange={e=>setOfficeIndex(Math.max(0,chizhOffices.findIndex(x=>x.id===e.target.value)))}>{chizhOffices.map(x=><option key={x.id} value={x.id}>{x.address}</option>)}</select></label>
+     <label>Имя *<input required maxLength="80" autoComplete="name" value={form.name} onChange={e=>update('name',e.target.value)} placeholder="Ваше имя"/></label>
+     <label>Телефон *<input required minLength="7" maxLength="30" inputMode="tel" type="tel" autoComplete="tel" value={form.phone} onChange={e=>update('phone',e.target.value)} placeholder="+7 (999) 000-00-00"/></label>
+     <label>Что хотите сделать?<select value={form.service} onChange={e=>update('service',e.target.value)}><option value="">Нужна консультация</option>{groups.map(x=><option key={x.id} value={x.name}>{x.name}</option>)}</select></label>
+     <label>Марка и модель<input value={form.car} maxLength="150" onChange={e=>update('car',e.target.value)} placeholder="Например, Toyota Camry 2022"/></label>
+     <div className="sv5-form-requested"><label>Желаемая дата<input type="date" value={form.requestedDate} onChange={e=>update('requestedDate',e.target.value)}/></label><label>Желаемое время<select value={form.requestedTime} onChange={e=>update('requestedTime',e.target.value)}><option value="">Любое время</option>{['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'].map(t=><option key={t} value={t}>{t}</option>)}</select></label></div>
+     <label>Комментарий<textarea rows="3" maxLength="1500" value={form.note} onChange={e=>update('note',e.target.value)} placeholder="Опишите задачу"/></label>
+     <div className="sc-form-buttons"><button type="submit" className="sc-button">Открыть письмо <ArrowUpRight size={17}/></button><button type="button" className="sc-button outline" onClick={copy}>Скопировать текст <Copy size={17}/></button></div>
+     <div className="sc-form-status" role="status" aria-live="polite">{message}</div>
+    </form>
+    <p className="sc-form-note">Запрос не отправляется с этой страницы автоматически. Дату и время сотрудник должен подтвердить отдельно. Для прямой связи: <a href={'tel:'+facts.tel}>{facts.phone}</a>.</p>
+   </div>
+  </section>
+ </>;
 }
+
 function App(){const path=useLocation();return <><a className="sc-skip" href="#sc-main">Перейти к содержимому</a><ShowroomHeader path={path}/><main id="sc-main" tabIndex="-1">{path==='/'?<ShowroomHome/>:path==='/services'?<ServicesPage/>:path==='/projects'?<ProjectsPage/>:path==='/prices'?<PricesPage/>:path==='/about'?<AboutPage/>:path==='/offers'?<OffersPage/>:<ContactsPage/>}</main><ShowroomFooter/><ShowroomMobileNav path={path}/></>}
 createRoot(document.getElementById('root')).render(<App/>);
