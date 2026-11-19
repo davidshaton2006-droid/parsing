@@ -44,7 +44,7 @@ $$('[data-image-fallback]').forEach(img=>{const fallback=()=>{if(img.dataset.fal
 
 
 /* Brand shortcut is a form prefill, not an assertion of service availability. */
-$('[data-vehicle]').forEach(b=>b.addEventListener('click',()=>{
+$$('[data-vehicle]').forEach(b=>b.addEventListener('click',()=>{
   openModal('');
   const field=$('[data-car]',form);
   if(!field)return;
@@ -61,7 +61,7 @@ let cmdFocus=null;
 function renderCommand(){
  if(!cmdInput||!cmdResults)return;
  const q=cmdInput.value.trim().toLocaleLowerCase('ru');cmdResults.replaceChildren();let total=0;
- $('[data-services] .service-card').forEach(card=>{
+ $$('[data-services] .service-card').forEach(card=>{
   const name=$('h3',card)?.textContent?.trim()||'',hint=$('p',card)?.textContent?.trim()||'';
   if(q&&!(name+' '+hint).toLocaleLowerCase('ru').includes(q))return;if(++total>9)return;
   const row=doc.createElement('button');row.type='button';row.className='command-result';
@@ -74,7 +74,7 @@ function renderCommand(){
 }
 function openCommand(){if(!command)return;cmdFocus=doc.activeElement;command.hidden=false;doc.body.classList.add('is-locked');cmdInput.value='';renderCommand();requestAnimationFrame(()=>cmdInput.focus())}
 function closeCommand(){if(!command)return;command.hidden=true;doc.body.classList.remove('is-locked');cmdFocus?.focus?.()}
-$('[data-command-open]').forEach(b=>b.addEventListener('click',openCommand));
+$$('[data-command-open]').forEach(b=>b.addEventListener('click',openCommand));
 $('[data-command-close]')?.addEventListener('click',closeCommand);
 cmdInput?.addEventListener('input',renderCommand);
 command?.addEventListener('click',e=>{if(e.target===command)closeCommand()});
@@ -83,7 +83,7 @@ doc.addEventListener('keydown',e=>{
  if(!command||command.hidden)return;
  if(e.key==='Escape'){e.preventDefault();closeCommand();return}
  if(e.key==='ArrowDown'&&doc.activeElement===cmdInput){const first=$('.command-result',cmdResults);if(first){e.preventDefault();first.focus()}}
- if(e.key==='Tab'){const f=$('input,button:not([disabled])',command).filter(x=>x.offsetParent!==null),i=f.indexOf(doc.activeElement);if(e.shiftKey&&i===0){e.preventDefault();f.at(-1)?.focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0]?.focus()}}
+ if(e.key==='Tab'){const f=$$('input,button:not([disabled])',command).filter(x=>x.offsetParent!==null),i=f.indexOf(doc.activeElement);if(e.shiftKey&&i===0){e.preventDefault();f.at(-1)?.focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0]?.focus()}}
 });
 
 /* Motion for JavaScript: optional cinematic polish; every section remains visible without it. */
