@@ -25,7 +25,7 @@ test('ST CAR: approved concept structure, services and source accuracy',async({p
 
 test('ST CAR: demo inquiry creates text but never confirms a booking',async({page})=>{
   await load(page);
-  await page.locator('[data-open-request="Компьютерная диагностика"]').click();
+  await page.locator('#diagnostics [data-open-request="Компьютерная диагностика"]').click();
   await expect(page.locator('#request-dialog')).toBeVisible();
   await expect(page.locator('#service-select')).toHaveValue('Компьютерная диагностика');
   await page.locator('input[name="car"]').fill('Toyota Corolla 2017');
