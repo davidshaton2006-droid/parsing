@@ -52,7 +52,7 @@ jobs:
         timeout-minutes: 4
         continue-on-error: true
         env:
-          CHIZH_MAX_PAGES: 150
+          CHIZH_MAX_PAGES: ${{ github.event_name == 'pull_request' && '28' || '150' }}
         run: npm run sync:official
 
       - name: Restore processed company photos
@@ -82,6 +82,15 @@ jobs:
       - name: Check interactive pages in desktop and mobile browsers
         working-directory: apps/chizh-avto
         run: npm run test:e2e
+
+      - name: Upload browser screenshots for design QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chizh-design-review
+          path: apps/chizh-avto/test-results/
+          if-no-files-found: ignore
+          retention-days: 3
 
       - name: Assemble Pages artifact without app sources or secrets
         shell: bash

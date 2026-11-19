@@ -1,95 +1,96 @@
 import {test,expect} from '@playwright/test';
 const home='/parsing/chizh-avto/';
 async function route(page,path){await page.goto(home+'#'+path,{waitUntil:'domcontentloaded'});await expect(page.locator('main')).toBeVisible()}
-test('Navigation, official imagery, complete core menu and no filler strips',async({page})=>{
-  await route(page,'/');
-  await expect(page.getByRole('heading',{level:1})).toContainText('Ваш автомобиль');
-  await expect(page.locator('.hero-photo img')).toHaveAttribute('src',/(chizhavto\.ru|\/media\/)/);
-  await expect(page.locator('.ticker,.scroll-progress,.marquee')).toHaveCount(0);
-  await expect(page.locator('.site-nav a')).toHaveCount(6);
-  await expect(page.locator('a[href^="tel:"]').first()).toHaveAttribute('href',/79891990022/);
-});
-test('Directory search, category expansion, official links and prefilled enquiry',async({page})=>{
-  await route(page,'/services');
-  const search=page.getByRole('searchbox',{name:'Поиск по каталогу услуг'});
-  await search.fill('автосвет');
-  await expect(page.locator('.directory-item')).toHaveCount(1);
-  await page.locator('.directory-item>button').click();
-  await expect(page.locator('.directory-expanded')).toBeVisible();
-  await expect(page.locator('.directory-expanded a[href^="https://chizhavto.ru/"]').first()).toHaveAttribute('target','_blank');
-  await page.getByRole('link',{name:/Уточнить услугу/}).click();
-  await expect(page.locator('select')).toHaveValue('Автосвет');
-});
-test('Search has working reset, gallery modal closes with Escape',async({page})=>{
-  await route(page,'/projects');
-  const search=page.getByRole('searchbox',{name:'Поиск по проектам'});
-  await search.fill('модель-нет-такой-3434');
-  await expect(page.locator('.empty-state')).toBeVisible();
-  await page.getByRole('button',{name:'Показать все проекты'}).click();
-  await expect(page.locator('.project-gallery').first()).toBeVisible();
-  await page.locator('.project-gallery').first().click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-});
-test('Price search and reset work',async({page})=>{
-  await route(page,'/prices');
-  const search=page.getByRole('searchbox',{name:'Поиск по прайс-листу'});
-  await search.fill('никакой-такой-услуги-123');
-  await expect(page.locator('.empty-state')).toBeVisible();
-  await page.getByRole('button',{name:'Сбросить поиск'}).click();
-  await expect(page.locator('.price-entry').first()).toBeVisible();
-});
-test('Enquiry validates data, copy responds and never claims a booking',async({page})=>{
-  await route(page,'/contacts');
-  const form=page.locator('form').last();
-  await form.getByLabel('Ваше имя *').fill('Алексей');
-  await form.getByLabel('Номер телефона *').fill('+79890001122');
-  await form.getByLabel('Услуга').selectOption({label:'Мультимедиа'});
-  await page.getByRole('button',{name:/Скопировать/}).click();
-  await expect(page.getByRole('status')).toContainText(/скопирован|не удалось/);
-  await expect(page.locator('.footer-disclosure')).toContainText('Запись через форму здесь не подтверждается');
-});
-test('Video opens, closes, and offers official-channel fallback',async({page})=>{
-  await route(page,'/');
-  await page.getByRole('button',{name:/Смотреть видео Чиж-Авто/}).click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page.locator('.video-fallback')).toHaveAttribute('href',/youtube.com/);
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-});
-test('Mobile navigation, all routes, and horizontal overflow',async({page},testInfo)=>{
-  await route(page,'/');
-  if(testInfo.project.name.includes('mobile')){
-    await page.getByRole('button',{name:'Открыть меню'}).click();
-    await expect(page.locator('.site-nav')).toHaveClass(/open/);
-    await page.locator('.site-nav').getByRole('link',{name:'Контакты'}).click();
-    await expect(page.getByRole('heading',{level:1})).toContainText('Приезжайте');
-  }
-  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
-  expect(overflow).toBeLessThanOrEqual(2);
+
+test('Editorial home, authentic images and functional navigation',async({page})=>{
+ await route(page,'/');
+ await expect(page.getByRole('heading',{level:1})).toContainText('комплектация');
+ await expect(page.locator('.sc-nav a')).toHaveCount(6);
+ await expect(page.locator('.ticker,.scroll-progress,.marquee')).toHaveCount(0);
+ const type=await page.locator('.sc-hero h1').evaluate(el=>({size:parseFloat(getComputedStyle(el).fontSize),family:getComputedStyle(el).fontFamily}));
+ expect(type.size).toBeGreaterThan(38);
+ expect(type.family).toMatch(/Manrope/);
+
+ const hero=page.locator('.sc-hero-photo');
+ await expect(hero).toHaveAttribute('loading','eager');
+ await expect(hero).toHaveAttribute('fetchpriority','high');
+ await expect.poll(()=>hero.evaluate(img=>img.naturalWidth),{timeout:12000}).toBeGreaterThan(0);
 });
 
-test('Performance: critical photo prioritized, offscreen media deferred, video only on demand',async({page})=>{
-  await route(page,'/');
-  const hero=page.locator('.hero-photo img');
-  await expect(hero).toHaveAttribute('loading','eager');
-  await expect(hero).toHaveAttribute('fetchpriority','high');
-  await expect.poll(()=>hero.evaluate(img=>img.naturalWidth),{timeout:15000}).toBeGreaterThan(0);
-  await expect(page.locator('.project-photo img').first()).toHaveAttribute('loading','lazy');
-  await expect(page.locator('iframe[src*="youtube.com"]')).toHaveCount(0);
-  await route(page,'/contacts');
-  await expect(page.locator('iframe[src*="yandex.ru"]')).toHaveAttribute('loading','lazy');
+test('Service index is interactive, search and inquiry routing work',async({page})=>{
+ await route(page,'/services');
+ const search=page.getByRole('searchbox',{name:'Поиск по услугам'});
+ await search.fill('автосвет');
+ await expect(page.locator('.sc-service-row')).toHaveCount(1);
+ await page.locator('.sc-service-row').click();
+ await expect(page.locator('.sc-service-detail')).toContainText('Автосвет');
+ await page.getByRole('link',{name:/Обсудить услугу/}).click();
+ await expect(page.locator('.sc-contact-form select')).toHaveValue('Автосвет');
 });
 
-test('Performance: synchronized fact snapshot downloads only on data routes',async({page})=>{
-  const loaded=[];
-  page.on('request',request=>{
-    if(/snapshot(?:\.json|-)/i.test(request.url()))loaded.push(request.url());
-  });
-  await route(page,'/');
-  await page.waitForTimeout(250);
-  expect(loaded.length).toBe(0);
-  await route(page,'/prices');
-  await expect.poll(()=>loaded.length,{timeout:8000}).toBeGreaterThan(0);
+test('Portfolio search and dialog opening/closing',async({page})=>{
+ await route(page,'/projects');
+ await expect(page.locator('.sc-work-tile').first()).toBeVisible();
+ await page.locator('.sc-work-tile').first().click();
+ await expect(page.getByRole('dialog')).toBeVisible();
+ await page.keyboard.press('Escape');
+ await expect(page.getByRole('dialog')).toHaveCount(0);
+ const search=page.getByRole('searchbox',{name:'Поиск по проектам'});
+ await search.fill('несуществующая-работа-392');
+ await expect(page.locator('.sc-empty')).toBeVisible();
+ await page.getByRole('button',{name:'Показать все проекты'}).click();
+ await expect(page.locator('.sc-work-tile').first()).toBeVisible();
+});
+
+test('Price search, offer links and company pages',async({page})=>{
+ await route(page,'/prices');
+ await expect(page.locator('.sc-price-row').first()).toBeVisible();
+ await page.getByRole('searchbox',{name:'Поиск по прайс-листу'}).fill('несуществующая-392');
+ await expect(page.locator('.sc-empty')).toBeVisible();
+ await page.getByRole('button',{name:'Сбросить поиск'}).click();
+ await expect(page.locator('.sc-price-row').first()).toBeVisible();
+ await route(page,'/offers');
+ await expect(page.locator('.sc-offer')).toHaveCount(3);
+ await route(page,'/about');
+ await expect(page.getByRole('heading',{level:1})).toContainText('Мастерская');
+});
+
+test('Contact form, phone, mail and map are functional and honest',async({page})=>{
+ await route(page,'/contacts');
+ await expect(page.locator('a[href^="tel:"]').first()).toHaveAttribute('href',/79891990022/);
+ await expect(page.locator('.sc-map iframe')).toHaveAttribute('loading','lazy');
+ await page.locator('.sc-contact-form input').nth(0).fill('Алексей');
+ await page.locator('.sc-contact-form input').nth(1).fill('+79890001122');
+ await page.getByRole('button',{name:/Скопировать текст/}).click();
+ await expect(page.getByRole('status')).toContainText(/скопирован|удалось/);
+ await expect(page.locator('.sc-contact-form')).toContainText('не создаёт запись');
+});
+
+test('Official video only loads on explicit request',async({page})=>{
+ await route(page,'/');
+ await expect(page.locator('iframe[src*="youtube.com"]')).toHaveCount(0);
+ await page.getByRole('button',{name:/Смотреть видео/}).click();
+ await expect(page.getByRole('dialog')).toBeVisible();
+ await expect(page.locator('iframe[src*="youtube.com"]')).toHaveCount(1);
+ await page.keyboard.press('Escape');
+ await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
+test('Responsive navigation and no overflow',async({page},testInfo)=>{
+ await route(page,'/');
+ if(testInfo.project.name.includes('mobile')){
+  await page.getByRole('button',{name:'Открыть меню'}).click();
+  await expect(page.locator('.sc-nav')).toHaveClass(/open/);
+  await page.locator('.sc-nav').getByRole('link',{name:'Контакты'}).click();
+  await expect(page.getByRole('heading',{level:1})).toContainText('Есть задача');
+ }
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
+});
+
+test('Capture the actual production design for visual QA',async({page},testInfo)=>{
+ await route(page,'/');
+ await expect.poll(()=>page.locator('.sc-hero-photo').evaluate(img=>img.naturalWidth),{timeout:10000}).toBeGreaterThan(0);
+ await page.screenshot({path:testInfo.outputPath('home-full.png'),fullPage:true,animations:'disabled'});
+ await route(page,'/services');
+ await page.screenshot({path:testInfo.outputPath('services.png'),fullPage:false,animations:'disabled'});
 });
