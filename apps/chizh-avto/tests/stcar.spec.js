@@ -8,6 +8,7 @@ async function load(page){
 test('ST CAR: approved concept structure, services and source accuracy',async({page})=>{
   await load(page);
   await expect(page.locator('.service-card')).toHaveCount(8);
+  await expect(page.locator('[data-symptom]')).toHaveCount(6);
   await expect(page.locator('.quick')).toHaveCount(4);
   await expect(page.locator('.demo-banner')).toContainText('Неофициальный');
   await expect(page.locator('.facts-strip')).toContainText('5,0');
@@ -71,6 +72,42 @@ test('ST CAR: on-demand map loads only when requested',async({page})=>{
   await expect(page.locator('#map-card iframe')).toHaveAttribute('src',/oid=25853057069/);
 });
 
+
+test('ST CAR: symptom navigator updates recommendation and passes the chosen service to inquiry',async({page})=>{
+  await load(page);
+  const navigator=page.locator('#symptoms');
+  await expect(navigator).toBeVisible();
+  const option=page.locator('[data-symptom="suspension"]');
+  await option.click();
+  await expect(option).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('[data-symptom="check"]')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#symptom-result-title')).toContainText('подвески');
+  await expect(page.locator('#symptom-service-link')).toHaveAttribute('href','#suspension');
+  await page.locator('#symptom-request').click();
+  await expect(page.locator('#request-dialog')).toBeVisible();
+  await expect(page.locator('#service-select')).toHaveValue('Подвеска и рулевое управление');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#request-dialog')).not.toBeVisible();
+});
+test('ST CAR: navigating to symptom service clears a previously applied filter',async({page})=>{
+  await load(page);
+  await page.locator('[data-filter="check"]').click();
+  await expect(page.locator('.service-card:visible')).toHaveCount(2);
+  await page.locator('[data-symptom="brakes"]').click();
+  await expect(page.locator('#symptom-result-title')).toContainText('тормозной');
+  await page.locator('#symptom-service-link').click();
+  await expect(page.locator('#brakes')).toBeVisible();
+  await expect(page.locator('.service-card:visible')).toHaveCount(8);
+  await expect(page.locator('[data-filter="all"]')).toHaveAttribute('aria-pressed','true');
+});
+test('ST CAR: layout does not overflow at compact and tablet widths',async({page})=>{
+  for(const width of [320,375,768,1024]){
+    await page.setViewportSize({width,height:844});
+    await load(page);
+    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+    expect(overflow,'overflow at '+width+'px').toBeLessThanOrEqual(2);
+  }
+});
 test('ST CAR: core content is available with JavaScript disabled',async({browser})=>{
   const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
   try{
