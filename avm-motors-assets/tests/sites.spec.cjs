@@ -6,7 +6,7 @@ for(const slug of ['avm-motors-red','avm-motors-heritage']){
       await expect(page.locator('h1')).toBeVisible();
       await expect(page.locator('[data-services] [data-cat]')).toHaveCount(20);
       await expect(page.locator('[data-photo]')).toHaveCount(8);
-      await expect(page.locator('a[href="tel:+79284112315"]').first()).toBeVisible();
+      await expect(page.locator('a[href="tel:+79284112315"]:visible').first()).toBeVisible();
       await expect(page.locator('[data-modal]')).toBeHidden();
       const width=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,win:innerWidth}));
       expect(width.doc).toBeLessThanOrEqual(width.win+2);
