@@ -33,7 +33,7 @@ function Frame({src,alt='',className='',eager=false,...p}){
   const optimized=entry && !useOriginal;
   const base=import.meta.env.BASE_URL;
   const imageSrc=optimized?base+entry.large:src;
-  const imageSet=optimized?base+entry.small+' '+entry.smallWidth+'w, '+base+entry.large+' '+entry.largeWidth+'w':undefined;
+  const imageSet=optimized?(entry.smallWidth===entry.largeWidth?base+entry.large+' '+entry.largeWidth+'w':base+entry.small+' '+entry.smallWidth+'w, '+base+entry.large+' '+entry.largeWidth+'w'):undefined;
   const onImageError=()=>{if(optimized)setUseOriginal(true);else setFailed(true)};
   return failed?<div className={'photo-unavailable '+className} role="img" aria-label={alt||'Фото Чиж-Авто временно недоступно'}><span>Фотография Чиж-Авто<br/>временно недоступна</span></div>
     :<img className={className} src={imageSrc} srcSet={imageSet} sizes={optimized?(eager?'100vw':'(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw'):undefined}
