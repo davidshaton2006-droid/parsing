@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     paths:
+      - 'st-car/**'
+      - 'index.html'
       - 'apps/chizh-avto/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
@@ -36,6 +38,9 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-chizh-${{ hashFiles('apps/chizh-avto/package.json') }}
+
+      - name: Validate ST CAR static site
+        run: node st-car/scripts/check-static.mjs
 
       - name: Install Chizh-Avto app dependencies
         working-directory: apps/chizh-avto
