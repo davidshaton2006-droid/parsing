@@ -1,0 +1,37 @@
+import {readFile,access} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {resolve,dirname} from 'node:path';
+import {Script} from 'node:vm';
+import assert from 'node:assert/strict';
+const dir=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const get=p=>readFile(resolve(dir,p),'utf8');
+const [html,css,js]=await Promise.all([get('index.html'),get('experience.css'),get('experience.js')]);
+for(const name of ['experience.css','experience.js','favicon.svg'])await access(resolve(dir,name));
+const count=pattern=>(html.match(pattern)||[]).length;
+assert(html.startsWith('<!doctype html>'),'Missing HTML doctype');
+assert(html.includes('<html lang="ru">'),'Wrong document language');
+assert(html.includes('href="./experience.css"')&&html.includes('src="./experience.js" defer'),'Interactive assets not wired');
+assert(html.includes('href="./favicon.svg"'),'Favicon missing');
+assert(html.includes('noindex,nofollow')&&html.includes('Неофициальный дизайн-концепт'),'Demo disclaimers missing');
+assert(html.includes('tel:+79186549999')&&html.includes('25853057069'),'Official contact/source missing');
+assert(!html.includes('images.unsplash.com'),'Unexpected third-party stock images');
+assert.equal(count(/class="service-card"/g),8,'Core services changed');
+assert.equal(count(/class="symptom-option"/g),6,'Symptom choices changed');
+assert.equal(count(/class="review-card"/g),3,'Sourced review cards changed');
+assert(count(/data-open-request=/g)>=14,'Inquiry triggers missing');
+assert(html.includes('id="symptom-request"')&&html.includes('id="symptom-service-link"'),'Symptom-to-service links missing');
+assert(html.includes('id="request-dialog"')&&html.includes('id="map-card"'),'Required dialog/map missing');
+assert(html.includes('prefers-reduced-motion')&&css.includes('prefers-reduced-motion'),'Reduced motion missing');
+assert(html.includes('loading="lazy" decoding="async" width="750" height="1000"'),'Workshop secondary photo is not lazy loaded');
+const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+assert.equal(new Set(ids).size,ids.length,'Duplicate element ids');
+for(const [,target] of html.matchAll(/href="#([^"]+)"/g))assert(ids.includes(target),'Dangling link #'+target);
+for(const tag of ['section','nav','article','dialog']){
+ assert.equal(count(new RegExp('<'+tag+'(?:\\s|>)','g')),count(new RegExp('</'+tag+'>','g')),'Unbalanced '+tag);
+}
+const inline=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert(inline,'Inline interaction code missing');
+new Script(inline,{filename:'stcar-inline.js'});
+new Script(js,{filename:'stcar-experience.js'});
+assert.equal((css.match(/\{/g)||[]).length,(css.match(/\}/g)||[]).length,'Unbalanced stylesheet');
+console.log('ST CAR audit OK: links, 6 symptom controls, 8 core services, demo form, media, responsive assets, scripts.');
