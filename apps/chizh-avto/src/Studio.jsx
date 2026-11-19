@@ -74,7 +74,7 @@ function Hero(){return <section className="sc-hero" aria-label="Возможно
  <p>Охрана и автозапуск, современная мультимедиа, качественный свет, звук и защита кузова. Дооснащение вашего автомобиля в Чиж-Авто.</p>
  <div className="sc-hero-buttons"><Button to="/services">Выбрать услугу</Button><SiteLink to="/projects" className="sc-text-link">Смотреть работы <ArrowUpRight size={18}/></SiteLink></div>
  <div className="sc-hero-foot"><span><b>20+ лет</b><small>по информации компании</small></span><span><b>12</b><small>направлений услуг</small></span><SiteLink to="/about" className="sc-arrow-alone" aria-label="Подробнее о Чиж-Авто"><ArrowUpRight size={24}/></SiteLink></div>
- </div><div className="sc-hero-visual"><Photo hero className="sc-hero-photo" src={PHOTO.hero} alt="Реальный автомобиль в установочном центре Чиж-Авто"/><div className="sc-hero-visual-caption"><span>Чиж-Авто / реальный проект</span><span>01 / 04</span></div></div></section>}
+ </div><div className="sc-hero-visual"><Photo hero className="sc-hero-photo" src={PHOTO.hero} alt="Реальный автомобиль в установочном центре Чиж-Авто"/><div className="sc-hero-visual-caption"><span>Чиж-Авто / реальный проект</span></div></div></section>}
 
 function ServiceIndex({full=false}){
  const [active,setActive]=useState('detail');
