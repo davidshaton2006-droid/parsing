@@ -28,7 +28,7 @@ test('ST CAR: demo inquiry creates text but never confirms a booking',async({pag
   await page.locator('textarea[name="problem"]').fill('Горит Check Engine');
   await page.getByRole('button',{name:/Подготовить и скопировать/}).click();
   await expect(page.locator('#form-result')).toBeVisible();
-  await expect(page.locator('#form-result')).toContainText('Toyota Corolla 2017');
+  await expect(page.locator('#form-result')).toHaveValue(/Toyota Corolla 2017/);
   await expect(page.locator('#form-status')).not.toBeEmpty();
   await page.getByRole('button',{name:'Закрыть окно'}).click();
   await expect(page.locator('#request-dialog')).not.toBeVisible();
