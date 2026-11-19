@@ -69,7 +69,7 @@ export default function CarBlueprint({active="diagnostic",onPick}){
     <text x="840" y="120" fill="#fa4559" fontSize="12" letterSpacing="3">ENGINE</text>
     <text x="94" y="423" fill="#f34a60" fontSize="11" letterSpacing="2">CHASSIS</text>
    </svg>
-   {hotspots.map(h=><button type="button" key={h.id} className={"hotspot"+(active===h.id?" is-active":"")} style={{left:h.x+"%",top:h.y+"%"}} onClick={()=>onPick?.(h.id)} aria-pressed={active===h.id} title={"Показать: "+h.name}>
+   {hotspots.map(h=><button type="button" key={h.id} className={"hotspot"+(active===h.id?" is-active":"")} style={{left:h.x+"%",top:h.y+"%"}} onClick={()=>onPick?.(h.id)} aria-pressed={active===h.id} aria-label={"Показать: "+h.name} title={"Показать: "+h.name}>
     <motion.span className="hotspot-ring" animate={reduced?{}:{scale:[1,1.65,1],opacity:[.6,.12,.6]}} transition={{duration:2.5,repeat:Infinity,delay:(h.x/50),ease:"easeOut"}}/>
     <span className="hotspot-core"><Crosshair size={12}/></span><span className="hotspot-tip">{h.name} <MoveUpRight size={11}/></span>
    </button>)}
