@@ -19,7 +19,7 @@ permissions:
 
 concurrency:
   group: github-pages-${{ github.event_name == 'pull_request' && github.head_ref || 'main' }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build-and-test:
