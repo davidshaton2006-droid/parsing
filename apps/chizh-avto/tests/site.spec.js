@@ -31,7 +31,7 @@ test('Portfolio search and dialog opening/closing',async({page})=>{
  await expect(page.getByRole('dialog')).toBeVisible();
  await page.keyboard.press('Escape');
  await expect(page.getByRole('dialog')).toHaveCount(0);
- const search=page.getByRole('textbox',{name:'Поиск по проектам'});
+ const search=page.getByRole('searchbox',{name:'Поиск по проектам'});
  await search.fill('несуществующая-работа-392');
  await expect(page.locator('.sc-empty')).toBeVisible();
  await page.getByRole('button',{name:'Показать все проекты'}).click();
