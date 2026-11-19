@@ -21,7 +21,7 @@ Redline Automotive Editorial: real shop imagery, near-black graphite, warm chalk
 - https://github.com/meta/astryx — React + StyleX design-system context only, see Astryx above.
 
 ## Business facts
-Public listing reviewed: https://yandex.com/maps/org/abm_motors/207066786029/ and user-provided https://yandex.ru/maps/org/avm_motors/136576810690/ . Address Krasnodar, Pamirskaya 2/1, phone +7 (928) 411-23-15. Gallery uses 8 direct Yandex public photo URLs; real owners retain rights. Ratings 5.0/101 are a snapshot dated 2026-11-19, not live. Price cues are explicitly unverified, not a binding public pricelist. Commercial photo use requires permission.
+Public listing reviewed: https://yandex.com/maps/org/abm_motors/207066786029/ and user-provided https://yandex.ru/maps/org/avm_motors/136576810690/ . Address Krasnodar, Pamirskaya 2/1, phone +7 (928) 411-23-15. Gallery uses 4 individually verified, loadable Yandex photo URLs (four broken CDN items were removed during visual QA); real owners retain rights. Ratings 5.0/101 are a snapshot dated 2026-11-19, not live. Price cues are explicitly unverified, not a binding public pricelist. Commercial photo use requires permission.
 
 ## Conversion and data model
 Four-step dialog: issue → brand/model/year → symptoms + time → name + optional phone, with validation, prior/next, accessible focus, summary, prepared copy + native share. **No backend, no storage, no real booking.** No private user data is transmitted by this demo.
