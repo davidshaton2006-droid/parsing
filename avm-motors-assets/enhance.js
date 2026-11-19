@@ -40,7 +40,39 @@ doc.addEventListener('keydown',e=>{
   if(lightbox&&!lightbox.hidden){if(e.key==='ArrowLeft')displayPhoto(state.lightIndex-1);if(e.key==='ArrowRight')displayPhoto(state.lightIndex+1);}
   const activeDialog=lightbox&&!lightbox.hidden?lightbox:(modal&&!modal.hidden?modal:null);if(e.key==='Tab'&&activeDialog){const f=$$('button:not([disabled]),a[href],input:not([disabled]),select,textarea',activeDialog).filter(x=>x.offsetParent!==null);if(!f.length)return;const i=f.indexOf(doc.activeElement);if(e.shiftKey&&i===0){e.preventDefault();f.at(-1).focus();}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();}}
 });
-$('[data-image-fallback]').forEach(img=>{const fallback=()=>{if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.imageFallback;};img.addEventListener('error',fallback);if(img.complete&&img.naturalWidth===0)fallback();});
+$$('[data-image-fallback]').forEach(img=>{const fallback=()=>{if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.imageFallback;};img.addEventListener('error',fallback);if(img.complete&&img.naturalWidth===0)fallback();});
+
+/* Command palette: discover services without navigating a dense grid. */
+const command=$('[data-command]'),cmdInput=$('[data-command-input]'),cmdResults=$('[data-command-results]');
+let cmdFocus=null;
+function renderCommand(){
+ if(!cmdInput||!cmdResults)return;
+ const q=cmdInput.value.trim().toLocaleLowerCase('ru');cmdResults.replaceChildren();let total=0;
+ $('[data-services] .service-card').forEach(card=>{
+  const name=$('h3',card)?.textContent?.trim()||'',hint=$('p',card)?.textContent?.trim()||'';
+  if(q&&!(name+' '+hint).toLocaleLowerCase('ru').includes(q))return;if(++total>9)return;
+  const row=doc.createElement('button');row.type='button';row.className='command-result';
+  const label=doc.createElement('span'),t=doc.createElement('strong'),sm=doc.createElement('small'),arr=doc.createElement('span');
+  t.textContent=name;sm.textContent=hint;arr.textContent='↗';label.append(t,sm);row.append(label,arr);
+  row.addEventListener('click',()=>{closeCommand();openModal(name)});
+  cmdResults.append(row);
+ });
+ if(!total){const empty=doc.createElement('p');empty.className='command-empty';empty.textContent='Не нашли услугу? Опишите проблему через форму обращения.';cmdResults.append(empty)}
+}
+function openCommand(){if(!command)return;cmdFocus=doc.activeElement;command.hidden=false;doc.body.classList.add('is-locked');cmdInput.value='';renderCommand();requestAnimationFrame(()=>cmdInput.focus())}
+function closeCommand(){if(!command)return;command.hidden=true;doc.body.classList.remove('is-locked');cmdFocus?.focus?.()}
+$('[data-command-open]').forEach(b=>b.addEventListener('click',openCommand));
+$('[data-command-close]')?.addEventListener('click',closeCommand);
+cmdInput?.addEventListener('input',renderCommand);
+command?.addEventListener('click',e=>{if(e.target===command)closeCommand()});
+doc.addEventListener('keydown',e=>{
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();command&&!command.hidden?closeCommand():openCommand();return}
+ if(!command||command.hidden)return;
+ if(e.key==='Escape'){e.preventDefault();closeCommand();return}
+ if(e.key==='ArrowDown'&&doc.activeElement===cmdInput){const first=$('.command-result',cmdResults);if(first){e.preventDefault();first.focus()}}
+ if(e.key==='Tab'){const f=$('input,button:not([disabled])',command).filter(x=>x.offsetParent!==null),i=f.indexOf(doc.activeElement);if(e.shiftKey&&i===0){e.preventDefault();f.at(-1)?.focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0]?.focus()}}
+});
+
 /* Motion for JavaScript: optional cinematic polish; every section remains visible without it. */
 if(typeof matchMedia==='function'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
   import('https://cdn.jsdelivr.net/npm/motion@12.0.0/+esm').then(({animate,inView})=>{
