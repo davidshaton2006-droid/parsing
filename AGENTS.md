@@ -4,9 +4,10 @@
 Before researching, creating, editing, reviewing or deploying a website in this repository, **read the full canonical skill first**:
 
 1. [skills/shaton-client-site-factory/SKILL.md](skills/shaton-client-site-factory/SKILL.md)
-2. [skills/shaton-client-site-factory/references/WORKFLOW.md](skills/shaton-client-site-factory/references/WORKFLOW.md)
-3. [skills/shaton-client-site-factory/references/DEPLOYMENT.md](skills/shaton-client-site-factory/references/DEPLOYMENT.md)
-4. [skills/shaton-client-site-factory/references/PROJECT_HISTORY.md](skills/shaton-client-site-factory/references/PROJECT_HISTORY.md)
+2. [skills/shaton-client-site-factory/references/TOOLKIT_AND_DESIGN_GATE.md](skills/shaton-client-site-factory/references/TOOLKIT_AND_DESIGN_GATE.md)
+3. [skills/shaton-client-site-factory/references/WORKFLOW.md](skills/shaton-client-site-factory/references/WORKFLOW.md)
+4. [skills/shaton-client-site-factory/references/DEPLOYMENT.md](skills/shaton-client-site-factory/references/DEPLOYMENT.md)
+5. [skills/shaton-client-site-factory/references/PROJECT_HISTORY.md](skills/shaton-client-site-factory/references/PROJECT_HISTORY.md)
 
 This rule applies to Codex, GitHub Copilot, Claude Code and other agents that support repository instructions; otherwise attach the files manually. Do not claim that an external AI tool auto-read the skill unless verified.
 
@@ -16,6 +17,6 @@ https://davidshaton2006-droid.github.io/parsing/<slug>/
 
 Never overwrite another client's site. Update the root index.html with a new demo entry. Verify the Pages workflow runs for any new slug, and inspect the live deployment.
 
-The four external design/animation references and their correct conditional usage are mandatory as stated in the SKILL.md. Real-world claims must be verified, unconfirmed material labeled as demo, and **all essential content visible without JavaScript**.
+**MANDATORY PRE-CODE GATE FOR EVERY NEW WEBSITE:** research the business and all EIGHT required tool sources (jakubkrehel, UI UX Pro Max, Astryx, Motion, Claude Code Templates, Aceternity via 21st CLI, @jahed, 21st.dev); present exactly FIVE DISTINCT IMAGE CONCEPTS, EACH with BOTH a desktop and mobile design; obtain the user's explicit approval of one concept; ONLY THEN write implementation code or deploy. Never substitute coded previews for the five images. Details are in TOOLKIT_AND_DESIGN_GATE.md. Real-world claims must be verified, unconfirmed material labeled as demo, and **all essential content visible without JavaScript**.
 
 Higher-priority tool, safety, privacy, legal, and repository access requirements still apply.
