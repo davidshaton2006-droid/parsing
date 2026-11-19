@@ -233,7 +233,7 @@ function ContactsPage(){
    </div>
    <div className="sc-contact-form sv5-contact-panel">
     <Eyebrow>Консультация</Eyebrow><h2>Обсудим ваш автомобиль.</h2>
-    <p>Подготовим письмо с вашими пожеланиями и данными автомобиля. Отправка происходит в почтовой программе; автоматической записи здесь нет.</p>
+    <p>Подготовим письмо с вашими пожеланиями и данными автомобиля. Отправка происходит в почтовой программе; эта страница не создаёт запись и не отправляет заявку самостоятельно.</p>
     <form onSubmit={mail}>
      <label>Филиал<select aria-label="Предпочтительный филиал" value={office.id} onChange={e=>{setOfficeIndex(Math.max(0,chizhOffices.findIndex(x=>x.id===e.target.value)));setMapOpen(false)}}>{chizhOffices.map(x=><option key={x.id} value={x.id}>{x.address}</option>)}</select></label>
      <label>Имя *<input required maxLength="80" autoComplete="name" value={form.name} onChange={e=>update('name',e.target.value)} placeholder="Ваше имя"/></label>
