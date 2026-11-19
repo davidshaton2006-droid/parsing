@@ -75,6 +75,7 @@ test('Performance: critical photo prioritized, offscreen media deferred, video o
   const hero=page.locator('.hero-photo img');
   await expect(hero).toHaveAttribute('loading','eager');
   await expect(hero).toHaveAttribute('fetchpriority','high');
+  await expect.poll(()=>hero.evaluate(img=>img.naturalWidth),{timeout:15000}).toBeGreaterThan(0);
   await expect(page.locator('.project-photo img').first()).toHaveAttribute('loading','lazy');
   await expect(page.locator('iframe[src*="youtube.com"]')).toHaveCount(0);
   await route(page,'/contacts');
@@ -84,7 +85,7 @@ test('Performance: critical photo prioritized, offscreen media deferred, video o
 test('Performance: synchronized fact snapshot downloads only on data routes',async({page})=>{
   const loaded=[];
   page.on('request',request=>{
-    if(request.url().includes('snapshot.json'))loaded.push(request.url());
+    if(/snapshot(?:\.json|-)/i.test(request.url()))loaded.push(request.url());
   });
   await route(page,'/');
   await page.waitForTimeout(250);
