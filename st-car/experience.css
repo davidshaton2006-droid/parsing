@@ -1,0 +1,40 @@
+/* ST CAR concept №1 — interactive service navigator */
+.symptoms{background:radial-gradient(ellipse at 80% 5%,#64192136,transparent 43%),#0b0e13;border-block:1px solid #2b323c}
+.symptoms-layout{display:grid;grid-template-columns:.94fr 1.06fr;gap:clamp(28px,5vw,76px);align-items:center}
+.symptom-guide .section-title em{font-style:normal;color:#ff515b}
+.symptom-guide .sub{max-width:500px;line-height:1.78}
+.symptom-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:36px 0 20px}
+.symptom-option{appearance:none;border:1px solid #39414d;background:linear-gradient(135deg,#202630,#171d25);color:#e7ebf0;text-align:left;padding:17px 14px;border-radius:9px;min-height:89px;display:flex;gap:11px;align-items:center;transition:background .2s,border-color .2s,transform .2s}
+.symptom-option:hover{border-color:#a65157;background:#282f39;transform:translateY(-2px)}
+.symptom-option[aria-pressed=true]{border-color:#fb535c;background:linear-gradient(135deg,#4b2027,#271c23);box-shadow:inset 3px 0 #f34650}
+.symptom-option>svg:first-child{color:#f65d65;width:23px;height:23px}
+.symptom-option span{font-size:12px;font-weight:800;line-height:1.38;flex:1}
+.symptom-option .symptom-chevron{color:#a5afb9;width:15px;height:15px}
+.symptom-caution{font-size:11px;line-height:1.7;color:#9ba6b3;display:flex;gap:10px;max-width:570px;margin:17px 0 0}
+.symptom-caution svg{width:20px;height:20px;color:#fa6269}
+.symptom-result{position:relative;min-height:568px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #404957;border-radius:14px;background:linear-gradient(160deg,#202630 0%,#121720 66%,#121720 100%);box-shadow:0 20px 62px #0005}
+.symptom-result:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 52% 33%,#f340492b,transparent 35%),repeating-linear-gradient(90deg,transparent 0 52px,#ffffff07 53px 54px),repeating-linear-gradient(0deg,transparent 0 52px,#ffffff06 53px 54px);pointer-events:none}
+.symptom-result-top{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;padding:24px 28px 0;font-size:10px;letter-spacing:.13em;font-weight:800;color:#bec7d0}
+.symptom-result-top>span:last-child{color:#fd6770;font-variant-numeric:tabular-nums}
+.symptom-schematic{position:relative;flex:1;min-height:210px;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.symptom-ring{position:relative;width:172px;height:172px;border:1px solid #f3556169;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#de293320,transparent 66%);box-shadow:0 0 0 22px #c3293112,0 0 0 55px #c3293109}
+.symptom-ring:before,.symptom-ring:after{content:"";position:absolute;inset:-20px;border:1px dashed #ac525d4f;border-radius:50%}
+.symptom-ring:after{inset:24px;border-style:solid;border-color:#f45e6850}
+.symptom-ring svg{width:84px;height:84px;color:#f15964;stroke-width:1.1;filter:drop-shadow(0 0 18px #e335434a)}
+.symptom-crosshair{position:absolute;left:22px;right:22px;border-top:1px solid #ffffff10}
+.symptom-crosshair.top{top:23%}.symptom-crosshair.bottom{bottom:20%}
+.symptom-grid-label{position:absolute;bottom:15px;right:29px;font-size:9px;letter-spacing:.12em;color:#838d9a;font-weight:800}
+.symptom-result-content{position:relative;z-index:1;background:linear-gradient(180deg,#1c222bb5,#171d26);padding:28px 30px 33px;border-top:1px solid #414957}
+.symptom-heading-tag{font-size:10px;color:#b2bdc8;letter-spacing:.095em;font-weight:800;display:flex;gap:8px;align-items:center}
+.symptom-heading-tag .live-dot{width:6px;height:6px}
+.symptom-result-content h3{font-size:clamp(23px,2.7vw,36px);margin:12px 0 7px;line-height:1.2;letter-spacing:-.05em}
+.symptom-result-content p{font-size:13px;color:#bec8d3;line-height:1.7;max-width:520px;min-height:44px;margin:0}
+.symptom-result-actions{display:flex;align-items:center;gap:10px;margin-top:23px;flex-wrap:wrap}
+.symptom-result-actions .btn{min-height:48px;font-size:12px}
+.process-photo{background:#181d24!important}
+.process-photo>img{position:absolute;width:100%;height:100%;object-fit:cover;inset:0;filter:brightness(.82) saturate(.78)}
+.process-photo .photo-caption{z-index:1}
+@media(max-width:1100px){.symptoms-layout{gap:25px}.symptom-option{min-height:98px;padding:14px 12px}.symptom-result{min-height:590px}.symptom-result-actions .btn{flex:1}}
+@media(max-width:850px){.symptoms-layout{grid-template-columns:1fr;gap:30px}.symptom-result{min-height:485px}.symptom-schematic{min-height:200px}.symptom-options{margin-top:27px}.symptom-result-content h3{font-size:30px}}
+@media(max-width:540px){.symptom-options{grid-template-columns:1fr 1fr;gap:7px}.symptom-option{min-height:86px;padding:12px 9px;gap:7px}.symptom-option span{font-size:10px}.symptom-option>svg:first-child{width:18px;height:18px}.symptom-option .symptom-chevron{display:none}.symptom-result{min-height:460px}.symptom-result-top{padding:20px 19px 0}.symptom-schematic{min-height:180px}.symptom-ring{width:125px;height:125px;box-shadow:0 0 0 16px #c3293112,0 0 0 32px #c3293109}.symptom-ring svg{width:65px;height:65px}.symptom-result-content{padding:22px 19px 24px}.symptom-result-content h3{font-size:25px}.symptom-result-actions{flex-direction:column;align-items:stretch}.symptom-result-actions .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.symptom-option{transition:none}}
