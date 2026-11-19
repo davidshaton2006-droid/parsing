@@ -83,7 +83,7 @@ test('Responsive navigation and no overflow',async({page},testInfo)=>{
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(2);
 });
 
-test('Capture the actual production design for visual QA',async({page},testInfo})=>{
+test('Capture the actual production design for visual QA',async({page},testInfo)=>{
  await route(page,'/');
  await expect.poll(()=>page.locator('.sc-hero-photo').evaluate(img=>img.naturalWidth),{timeout:10000}).toBeGreaterThan(0);
  await page.screenshot({path:testInfo.outputPath('home-full.png'),fullPage:true,animations:'disabled'});
