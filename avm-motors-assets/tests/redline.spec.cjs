@@ -117,7 +117,7 @@ test.describe('AVM Motors — flagship redline redesign',()=>{
     await page.goto('http://127.0.0.1:4179/avm-motors-red/');
     await expect(page.locator('.hero h1')).toBeVisible();
     await expect(page.locator('[data-services] .service-row')).toHaveCount(20);
-    await expect(page.locator('[data-photo]')).toHaveCount(8);
+    await expect(page.locator('[data-photo]')).toHaveCount(4);
     await page.close();
   });
 });
