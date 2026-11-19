@@ -10,6 +10,7 @@
 - [RIA-Service](https://davidshaton2006-droid.github.io/parsing/ria-service/)
 
 - [Чиж-Авто, React](https://davidshaton2006-droid.github.io/parsing/chizh-avto/)
+- [ST CAR](https://davidshaton2006-droid.github.io/parsing/st-car/)
 
 ## Структура
 
