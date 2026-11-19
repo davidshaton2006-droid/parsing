@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-label="Авторская техническая иллюстрация автомобиля, не фотография автосервиса">
 <defs>
-  <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#97acc1" stop-opacity=".14"/><stop offset=".4" stop-color="#182c3b" stop-opacity=".8"/><stop offset="1" stop-color="#10151b" stop-opacity=".92"/></linearGradient>
-  <linearGradient id="lines" x1="0" x2="1"><stop stop-color="#42b4f3" stop-opacity=".2"/><stop offset=".53" stop-color="#56d5ff"/><stop offset="1" stop-color="#c6f4ff" stop-opacity=".5"/></linearGradient>
-  <linearGradient id="glass" x1="0" x2="1"><stop stop-color="#0a293b"/><stop offset=".6" stop-color="#165277"/><stop offset="1" stop-color="#0c1c29"/></linearGradient>
-  <radialGradient id="glow"><stop stop-color="#13a0e6" stop-opacity=".34"/><stop offset="1" stop-color="#13a0e6" stop-opacity="0"/></radialGradient>
+  <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a5a8af" stop-opacity=".14"/><stop offset=".4" stop-color="#21191d" stop-opacity=".8"/><stop offset="1" stop-color="#100d10" stop-opacity=".92"/></linearGradient>
+  <linearGradient id="lines" x1="0" x2="1"><stop stop-color="#ff324a" stop-opacity=".2"/><stop offset=".53" stop-color="#ff7c87"/><stop offset="1" stop-color="#ffdce0" stop-opacity=".5"/></linearGradient>
+  <linearGradient id="glass" x1="0" x2="1"><stop stop-color="#271318"/><stop offset=".6" stop-color="#68303a"/><stop offset="1" stop-color="#251115"/></linearGradient>
+  <radialGradient id="glow"><stop stop-color="#c71931" stop-opacity=".34"/><stop offset="1" stop-color="#c71931" stop-opacity="0"/></radialGradient>
   <filter id="soft"><feGaussianBlur stdDeviation="17"/></filter>
   <filter id="redglow"><feGaussianBlur stdDeviation="7"/></filter>
-  <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse"><path d="M46 0H0V46" fill="none" stroke="#42bbfa" stroke-opacity=".07" stroke-width="1"/></pattern>
+  <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse"><path d="M46 0H0V46" fill="none" stroke="#ef4b59" stroke-opacity=".07" stroke-width="1"/></pattern>
 </defs>
 <rect width="1200" height="700" fill="url(#grid)"/><ellipse cx="617" cy="340" rx="560" ry="350" fill="url(#glow)"/>
-<g opacity=".45" stroke="#55b7ed" stroke-width="1" fill="none"><path d="M40 560H1140M80 598H1160M140 638H1060"/><path d="M200 550l90 90M340 550l60 90M490 550l30 90M650 550l-30 90M810 550l-90 90M960 550l-130 90"/></g>
+<g opacity=".45" stroke="#c95060" stroke-width="1" fill="none"><path d="M40 560H1140M80 598H1160M140 638H1060"/><path d="M200 550l90 90M340 550l60 90M490 550l30 90M650 550l-30 90M810 550l-90 90M960 550l-130 90"/></g>
 <g stroke="url(#lines)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
   <path fill="url(#body)" d="M111 412c17-29 47-61 93-80l106-43c31-17 88-75 144-106 52-30 127-41 247-33 85 5 172 42 225 93l87 30c57 19 98 52 115 95 13 35 17 91-1 130l-57 14-33-5c-13-63-53-103-113-108-65-5-118 37-126 96l-448 10c-7-61-54-100-116-101-61-1-110 37-119 96l-71-9c-23-27-25-55-20-80z"/>
   <path fill="url(#glass)" d="M364 281c61-54 111-95 191-107 70-11 148-8 198 5 57 15 123 52 160 92l-549 10z"/>
@@ -17,16 +17,16 @@
   <path d="M153 405l75-17 137-46 322-29 229-1 119 25 38 56" fill="none" stroke-width="1.8" opacity=".72"/>
   <path d="M394 330l-13 86m269-100 19 148m230-158-28 76" opacity=".44"/>
   <path d="M354 414l420-12m-241 35 175-4" opacity=".45"/>
-  <path d="M976 315c45 12 86 39 119 73l-112-9z" fill="#183947"/>
-  <path d="m128 429 85-21 42 8-89 30z" fill="#17374a"/>
+  <path d="M976 315c45 12 86 39 119 73l-112-9z" fill="#4f202c"/>
+  <path d="m128 429 85-21 42 8-89 30z" fill="#472027"/>
   <path d="m234 355 90-38M936 284l43-13" stroke-width="3"/>
   <path d="m1089 449-23 14M129 449l-31 12" stroke-width="4"/>
 </g>
-<g stroke="#60cfff" stroke-width="2.3" opacity=".95" fill="none"><path d="m300 287-23 58 73 3m104-168-38 72 36 16m346-85 91 85M997 343l65 37"/><path d="M359 373l-25 43m393-92 26 70m-343-42 185-12" stroke-dasharray="6 9"/></g>
-<g fill="#09131c" stroke="#5ac3fa" stroke-width="4"><circle cx="283" cy="487" r="89"/><circle cx="282" cy="487" r="55" stroke-width="3"/><circle cx="282" cy="487" r="26"/><circle cx="931" cy="483" r="93"/><circle cx="931" cy="483" r="57" stroke-width="3"/><circle cx="931" cy="483" r="27"/></g>
-<g stroke="#53b7ea" stroke-opacity=".65" fill="none" stroke-width="2"><path d="M283 401v173m-87-87h173m562-98v188m-95-94h190"/><path d="M211 424l143 130m-143 0 143-130m507 0 140 131m-140 0 140-131"/></g>
+<g stroke="#ff5568" stroke-width="2.3" opacity=".95" fill="none"><path d="m300 287-23 58 73 3m104-168-38 72 36 16m346-85 91 85M997 343l65 37"/><path d="M359 373l-25 43m393-92 26 70m-343-42 185-12" stroke-dasharray="6 9"/></g>
+<g fill="#100c11" stroke="#ff6276" stroke-width="4"><circle cx="283" cy="487" r="89"/><circle cx="282" cy="487" r="55" stroke-width="3"/><circle cx="282" cy="487" r="26"/><circle cx="931" cy="483" r="93"/><circle cx="931" cy="483" r="57" stroke-width="3"/><circle cx="931" cy="483" r="27"/></g>
+<g stroke="#d44155" stroke-opacity=".65" fill="none" stroke-width="2"><path d="M283 401v173m-87-87h173m562-98v188m-95-94h190"/><path d="M211 424l143 130m-143 0 143-130m507 0 140 131m-140 0 140-131"/></g>
 <g fill="#f91325" stroke="#ff3040" stroke-width="2"><path d="M1017 348l63 24 25 21-65-12-33-22z"/><path d="M153 417l50-12-24 22-28 6z"/></g>
 <g stroke="#ff263b" fill="none"><circle cx="785" cy="395" r="28" stroke-width="3"/><circle cx="785" cy="395" r="51" opacity=".4" stroke-dasharray="5 9"/><path d="M785 344V287l109-45h78" stroke-width="1.7"/><circle cx="972" cy="242" r="5" fill="#fe2c42"/></g>
-<g fill="#48c9fc"><circle cx="364" cy="282" r="5"/><circle cx="908" cy="272" r="5"/><circle cx="679" cy="318" r="4"/></g>
-<g font-family="monospace" fill="#a7dff5" font-size="13" letter-spacing="2" opacity=".6"><text x="68" y="101">VEHICLE / DIAGNOSTIC FIELD</text><text x="958" y="155">SENSOR ARRAY</text><text x="42" y="672">SYSTEMS / 01 · 04 · 07</text></g>
+<g fill="#fb6074"><circle cx="364" cy="282" r="5"/><circle cx="908" cy="272" r="5"/><circle cx="679" cy="318" r="4"/></g>
+<g font-family="monospace" fill="#f5b6bd" font-size="13" letter-spacing="2" opacity=".6"><text x="68" y="101">VEHICLE / DIAGNOSTIC FIELD</text><text x="958" y="155">SENSOR ARRAY</text><text x="42" y="672">SYSTEMS / 01 · 04 · 07</text></g>
 </svg>
