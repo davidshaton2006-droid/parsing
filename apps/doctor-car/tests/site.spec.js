@@ -53,3 +53,10 @@ test('real screenshots of approved dark and light visual', async({page},testInfo
  await page.reload();
  await page.screenshot({path:testInfo.outputPath('doctor-light.png'),fullPage:true,animations:'disabled'});
 });
+test('mobile keeps the interactive diagnostic panel visible', async({page},testInfo)=>{
+ if(testInfo.project.name!=='mobile')return;
+ await page.goto(base);
+ await expect(page.locator('.diagnostic-panel')).toBeVisible();
+ await page.getByRole('button',{name:'Выбрать узел: Тормозная система'}).click();
+ await expect(page.locator('.diagnostic-panel h2')).toContainText('Тормозная система');
+});

@@ -198,3 +198,7 @@ body{background:var(--bg);letter-spacing:-.012em}
  .service-icon{width:40px;height:40px}
 }
 @media(prefers-reduced-motion:reduce){.car-visual{animation:none!important}.service-card:after{transition:none}}
+
+/* Compact demo attribution instead of a large mobile splash. */
+.demo-copy{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+@media(max-width:760px){.demo-label{min-height:0;padding:6px 9px;gap:3px 12px;font-size:9px;line-height:1.4}.demo-copy{gap:6px}.demo-label>a{white-space:nowrap}}
