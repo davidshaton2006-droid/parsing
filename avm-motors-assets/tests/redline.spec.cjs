@@ -31,7 +31,7 @@ test.describe('AVM Motors — flagship redline redesign',()=>{
     await page.locator('[data-filter="trans"]').click();
     await expect(page.locator('[data-services] .service-row:visible')).toHaveCount(1);
     await page.locator('[data-filter="all"]').click();
-    await page.locator('[data-search]').fill('сход');
+    await page.locator('[data-search]').fill('Сход-развал 3D');
     await expect(page.locator('[data-services] .service-row:visible')).toHaveCount(1);
     await page.locator('[data-search]').fill('');
     await expect(page.locator('[data-services] .service-row:visible')).toHaveCount(20);
