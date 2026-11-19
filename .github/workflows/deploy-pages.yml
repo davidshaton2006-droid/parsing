@@ -38,6 +38,18 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-npm-chizh-${{ hashFiles('apps/chizh-avto/package.json') }}
 
+      - name: Install Doctor Car React dependencies
+        working-directory: apps/doctor-car
+        run: npm install --no-audit --no-fund
+
+      - name: Build and verify Doctor Car with both theme styles
+        working-directory: apps/doctor-car
+        run: |
+          npm run build
+          npm run check
+          test -s dist/index.html
+          test -d dist/assets
+
       - name: Install Chizh-Avto app dependencies
         working-directory: apps/chizh-avto
         run: npm install --no-audit --no-fund
@@ -83,18 +95,6 @@ jobs:
       - name: Check interactive pages in desktop and mobile browsers
         working-directory: apps/chizh-avto
         run: npm run test:e2e
-
-      - name: Install Doctor Car React dependencies
-        working-directory: apps/doctor-car
-        run: npm install --no-audit --no-fund
-
-      - name: Build and verify Doctor Car with both theme styles
-        working-directory: apps/doctor-car
-        run: |
-          npm run build
-          npm run check
-          test -s dist/index.html
-          test -d dist/assets
 
       - name: Test Doctor Car interactions on desktop and mobile
         working-directory: apps/doctor-car
