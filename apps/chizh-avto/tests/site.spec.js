@@ -61,7 +61,7 @@ test('Preferred date and time reach contact request, never confirm a reservation
  await page.getByLabel('Желаемая дата').fill('2027-01-19');
  await page.getByLabel('Желаемое время').selectOption('14:00');
  await page.getByRole('link',{name:/Подготовить запрос/}).click();
- await expect(page.getByRole('heading',{level:1})).toContainText('Есть задача');
+ await expect(page.getByRole('heading',{level:1})).toContainText('Приезжайте в Чиж-Авто');
  await expect(page.locator('.sc-contact-form input[type="date"]')).toHaveValue('2027-01-19');
  await expect(page.locator('.sc-contact-form select').last()).toHaveValue('14:00');
  await expect(page.locator('.sc-contact-form')).toContainText('не создаёт запись');
@@ -81,7 +81,7 @@ test('Mobile navigation is usable and page has no horizontal overflow',async({pa
   await page.getByRole('button',{name:'Открыть меню'}).click();
   await expect(page.locator('.sv5-nav')).toHaveClass(/sv5-nav-open/);
   await page.locator('.sv5-nav').getByRole('link',{name:'Контакты'}).click();
-  await expect(page.getByRole('heading',{level:1})).toContainText('Есть задача');
+  await expect(page.getByRole('heading',{level:1})).toContainText('Приезжайте в Чиж-Авто');
   await expect(page.locator('.sv5-mobile-bottom')).toBeVisible();
  }
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
@@ -97,4 +97,47 @@ test('Review real screenshot of concept 5 across breakpoints',async({page},testI
  await page.screenshot({path:testInfo.outputPath('showroom-home-full.png'),fullPage:true,animations:'disabled'});
  await page.locator('.sv5-projects').scrollIntoViewIfNeeded();
  await page.screenshot({path:testInfo.outputPath('showroom-projects.png'),animations:'disabled'});
+});
+
+
+test('Prices: labeled values, car class control, search, and no header rows passed as services',async({page},testInfo)=>{
+ await route(page,'/prices');
+ await expect(page.getByRole('heading',{level:1})).toContainText('Цены на услуги');
+ await expect(page.locator('.sv5-price-entry').first()).toBeVisible();
+ await expect(page.locator('.sv5-price-entry').first().locator('.sv5-price-value strong').first()).not.toBeEmpty();
+ await expect(page.getByLabel('Класс автомобиля для отображения стоимости')).toBeVisible();
+ await expect(page.locator('.sv5-price-entry h2',{hasText:/^(Услуга|Стоимость)$/i})).toHaveCount(0);
+ await page.getByLabel('Класс автомобиля для отображения стоимости').selectOption('1');
+ await page.getByLabel('Класс автомобиля для отображения стоимости').selectOption('all');
+ await page.getByRole('searchbox',{name:'Поиск по прайс-листу'}).fill('откровенно_несуществующая_позиция_34982');
+ await expect(page.locator('.sv5-price-entry')).toHaveCount(0);
+ await page.getByRole('button',{name:'Очистить поиск'}).click();
+ await expect(page.locator('.sv5-price-entry').first()).toBeVisible();
+ await page.evaluate(()=>window.scrollTo(0,0));
+ await page.screenshot({path:testInfo.outputPath('prices-page.png'),fullPage:true,animations:'disabled'});
+});
+
+test('Contacts: both branches, route, same verified phone, and inquiry',async({page},testInfo)=>{
+ await route(page,'/contacts');
+ const cards=page.getByRole('group',{name:'Выбор филиала Чиж-Авто'});
+ await expect(cards.getByRole('button')).toHaveCount(2);
+ await expect(cards.getByRole('button').nth(0)).toHaveAttribute('aria-pressed','true');
+ await cards.getByRole('button').nth(1).click();
+ await expect(cards.getByRole('button').nth(1)).toHaveAttribute('aria-pressed','true');
+ await expect(page.locator('.sv5-office-address-line')).toContainText('Каляева, 89');
+ await expect(page.getByRole('link',{name:/Построить маршрут/})).toHaveAttribute('href',/Каляева|%D0%9A%D0%B0%D0%BB%D1%8F%D0%B5%D0%B2%D0%B0/i);
+ await expect(page.getByLabel('Предпочтительный филиал')).toHaveValue('kalyaeva');
+ await page.getByLabel('Предпочтительный филиал').selectOption('zhloby');
+ await expect(cards.getByRole('button').nth(0)).toHaveAttribute('aria-pressed','true');
+ await page.getByRole('button',{name:/Показать карту/}).click();
+ await expect(page.locator('.sv5-office-map iframe')).toHaveAttribute('src',/oid=1266081535/);
+ await expect(page.locator('.sv5-office-links a[href^="tel:"]')).toHaveAttribute('href','tel:+79891990022');
+ await page.getByPlaceholder('Ваше имя').fill('Тестовый посетитель');
+ await page.getByPlaceholder('+7 (999) 000-00-00').fill('+7 999 111-22-33');
+ await page.getByRole('button',{name:/Скопировать текст/}).click();
+ await expect(page.locator('.sc-form-status')).not.toBeEmpty();
+ await page.evaluate(()=>window.scrollTo(0,0));
+ await page.screenshot({path:testInfo.outputPath('contacts-page.png'),fullPage:true,animations:'disabled'});
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+ expect(overflow).toBeLessThanOrEqual(2);
 });
