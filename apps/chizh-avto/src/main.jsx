@@ -156,17 +156,17 @@ function normalizePriceRows(snapshot){
 function PricesPage(){
  const snap=useSnapshot(true);
  const [q,setQ]=useState('');
- const [showAll,setShowAll]=useState(false);
+ const [visibleCount,setVisibleCount]=useState(12);
  const [car,setCar]=useState('all');
  const all=useMemo(()=>normalizePriceRows(snap),[snap]);
  const term=q.trim().toLocaleLowerCase('ru');
  const filtered=all.filter(x=>(x.name+' '+x.section).toLocaleLowerCase('ru').includes(term));
- const shown=showAll?filtered:filtered.slice(0,32);
+ const shown=filtered.slice(0,visibleCount);
  return <>
   <PageIntro kicker="Прайс-лист Чиж-Авто" title="Цены на услуги." desc="Без смешения классов автомобилей: каждый вариант стоимости подписан. Окончательная цена зависит от модели, комплектации и состава работ."/>
   <section className="sc-price-section sv5-price-page"><div className="sc-wrap">
    <div className="sv5-price-tools">
-    <label className="sc-search sv5-price-search"><Search size={19}/><input value={q} onChange={e=>{setQ(e.target.value);setShowAll(false)}} type="search" aria-label="Поиск по прайс-листу" placeholder="Найти услугу или направление"/><span aria-live="polite">{filtered.length} позиций</span></label>
+    <label className="sc-search sv5-price-search"><Search size={19}/><input value={q} onChange={e=>{setQ(e.target.value);setVisibleCount(12)}} type="search" aria-label="Поиск по прайс-листу" placeholder="Найти услугу или направление"/><span aria-live="polite">{filtered.length} позиций</span></label>
     <label className="sv5-price-choice">Класс автомобиля
      <select aria-label="Класс автомобиля для отображения стоимости" value={car} onChange={e=>setCar(e.target.value)}>
       <option value="all">Все классы</option>
@@ -186,7 +186,7 @@ function PricesPage(){
      </article>;
     })}
    </div>
-   {filtered.length>shown.length&&<button className="sc-more dark sv5-price-more" onClick={()=>setShowAll(true)} type="button">Показать ещё {filtered.length-shown.length} позиций <Plus size={19}/></button>}
+   {filtered.length>shown.length&&<button className="sc-more dark sv5-price-more" onClick={()=>setVisibleCount(n=>n+12)} type="button">Показать ещё {Math.min(12,filtered.length-shown.length)} позиций <Plus size={19}/></button>}
    {filtered.length===0&&<div className="sc-empty sv5-empty-price">По такому запросу услуг не найдено. <button type="button" onClick={()=>setQ('')}>Очистить поиск</button></div>}
    <div className="sc-price-footer sv5-price-footer"><p>Стоимость указана по открытому прайсу компании. Цены могут изменяться, особенно при подборе оборудования под конкретный автомобиль. Не является окончательной сметой.</p><Out to={ORIGIN+'/prices/'} className="sc-inline-cta">Сверить с оригинальным прайсом <ArrowUpRight size={17}/></Out></div>
   </div></section>
