@@ -136,7 +136,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/pages"
           rsync -a ./ "$RUNNER_TEMP/pages/" \
             --exclude='/.git/' --exclude='/.github/' --exclude='/apps/' \
-            --exclude='/skills/' --exclude='*.md' --exclude='*.zip' \
+            --exclude='/skills/' --exclude='/st-car/scripts/' --exclude='*.md' --exclude='*.zip' \
             --exclude='node_modules/' --exclude='*.env' --exclude='*.map' \
             --exclude='playwright-report/' --exclude='test-results/'
           rm -rf "$RUNNER_TEMP/pages/chizh-avto"
