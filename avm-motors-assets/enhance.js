@@ -5,7 +5,6 @@ const state={modalFocus:null,lightIndex:0};
 const menu=$('[data-menu]'),nav=$('[data-nav]');
 if(menu&&nav){menu.addEventListener('click',()=>{const open=!nav.classList.contains('is-open');nav.classList.toggle('is-open',open);menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'Закрыть ×':'Меню ☰';});
 $$('a',nav).forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('is-open');menu.setAttribute('aria-expanded','false');menu.textContent='Меню ☰';}));}
-const progress=$('[data-progress]');if(progress){let raf=false;addEventListener('scroll',()=>{if(raf)return;raf=true;requestAnimationFrame(()=>{const max=Math.max(1,doc.documentElement.scrollHeight-innerHeight);progress.style.width=Math.min(100,Math.round(scrollY/max*100))+'%';raf=false;});},{passive:true});}
 const list=$('[data-services]'),count=$('[data-count]'),search=$('[data-search]');
 function applyFilters(){if(!list)return;const active=$('[data-filter][aria-pressed=true]')?.dataset.filter||'all',q=(search?.value||'').trim().toLocaleLowerCase('ru');let visible=0;$$('[data-cat]',list).forEach(card=>{const yes=(active==='all'||card.dataset.cat===active)&&(!q||card.textContent.toLocaleLowerCase('ru').includes(q));card.hidden=!yes;if(yes)visible++;});if(count)count.textContent=visible+' из '+$$('[data-cat]',list).length;const empty=$('[data-empty]');if(empty)empty.hidden=visible>0;}
 $$('[data-filter]').forEach(b=>b.addEventListener('click',()=>{$$('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));applyFilters();}));
