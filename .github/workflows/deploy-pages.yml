@@ -52,7 +52,7 @@ jobs:
         timeout-minutes: 4
         continue-on-error: true
         env:
-          CHIZH_MAX_PAGES: 150
+          CHIZH_MAX_PAGES: ${{ github.event_name == 'pull_request' && '28' || '150' }}
         run: npm run sync:official
 
       - name: Restore processed company photos
