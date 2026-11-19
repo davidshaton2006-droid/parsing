@@ -6,7 +6,7 @@ test.describe('AVM Motors — flagship redline redesign',()=>{
     await page.goto(slug,{waitUntil:'domcontentloaded'});
     await expect(page.locator('.hero h1')).toContainText('НЕТ МЕЛОЧЕЙ');
     await expect(page.locator('[data-services] [data-cat]')).toHaveCount(20);
-    await expect(page.locator('[data-photo]')).toHaveCount(8);
+    await expect(page.locator('[data-photo]')).toHaveCount(4);
     await expect(page.locator('[data-progress]')).toHaveCount(0);
     await expect(page.locator('.hero img')).toHaveCount(2);
     await expect(page.locator('a[href^="tel:"]:visible').first()).toBeVisible();
@@ -95,9 +95,9 @@ test.describe('AVM Motors — flagship redline redesign',()=>{
     await page.locator('[data-photo]').first().click();
     await expect(page.locator('[data-lightbox]')).toBeVisible();
     await page.locator('[data-lightbox-next]').click();
-    await expect(page.locator('[data-lightbox-count]')).toContainText('02 / 08');
+    await expect(page.locator('[data-lightbox-count]')).toContainText('02 / 04');
     await page.keyboard.press('ArrowLeft');
-    await expect(page.locator('[data-lightbox-count]')).toContainText('01 / 08');
+    await expect(page.locator('[data-lightbox-count]')).toContainText('01 / 04');
     await page.keyboard.press('Escape');
     await expect(page.locator('[data-lightbox]')).toBeHidden();
   });
