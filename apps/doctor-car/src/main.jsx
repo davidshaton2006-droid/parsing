@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {motion,AnimatePresence} from 'motion/react';
-import {ArrowRight,ArrowUpRight,Check,CheckCircle2,ChevronDown,Phone,MapPin,Clock3,Sun,Moon,Menu,X,ExternalLink,Search,ShieldCheck,ScanLine,Settings2,Disc3,CarFront,Wrench,ClipboardCopy,Info,Activity,Route,OilCan,Layers3,MessageSquareText,Gauge} from 'lucide-react';
+import {ArrowRight,ArrowUpRight,Check,CheckCircle2,ChevronDown,Phone,MapPin,Clock3,Sun,Moon,Menu,X,ExternalLink,Search,ShieldCheck,ScanLine,Settings2,Disc3,CarFront,Wrench,ClipboardCopy,Info,Activity,Route,Droplets,Layers3,MessageSquareText,Gauge} from 'lucide-react';
 import CarBlueprint from './CarBlueprint.jsx';
 import {COMPANY,SERVICES,SYMPTOMS,FAQ} from './data.js';
 import './style.css';
@@ -9,7 +9,7 @@ import './style.css';
 const PAGES=[['/','Главная'],['/services','Услуги'],['/work','Работы'],['/prices','Стоимость'],['/contact','Контакты']];
 const to=(p)=>'#'+p;
 const current=()=>{const r=location.hash.slice(1).split('?')[0];return PAGES.some(([p])=>p===r)?r:'/'};
-const ICONS={diagnostic:ScanLine,maintenance:OilCan,engine:Settings2,suspension:Disc3,steering:Gauge,transmission:Layers3,metal:Wrench,parts:CarFront};
+const ICONS={diagnostic:ScanLine,maintenance:Droplets,engine:Settings2,suspension:Disc3,steering:Gauge,transmission:Layers3,metal:Wrench,parts:CarFront};
 const Logo=()=> <a className="brand" href="#/" aria-label="Доктор Кар — главная"><span className="logo-mark"><i/><i/></span><span className="logo-text"><strong>ДОКТОР <em>КАР</em></strong><small>АВТОСЕРВИС · КРАСНОДАР</small></span></a>;
 const Icon=({id,size=26})=>{const Component=ICONS[id]||Wrench;return <Component size={size} strokeWidth={1.65}/>};
 const Btn=({children,href,onClick,kind='primary',className='',...props})=>href?<a href={href} className={'btn btn-'+kind+' '+className} {...props}>{children}</a>:<button type="button" onClick={onClick} className={'btn btn-'+kind+' '+className} {...props}>{children}</button>;
