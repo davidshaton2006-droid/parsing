@@ -9,7 +9,9 @@
     "preview": "vite preview --host 0.0.0.0",
     "sync:official": "node scripts/sync-official.mjs",
     "test:e2e": "playwright test",
-    "check:static": "node scripts/check-static.mjs"
+    "check:static": "node scripts/check-static.mjs",
+    "optimize:media": "node scripts/optimize-media.mjs",
+    "check:budget": "node scripts/check-performance.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.7.0",
@@ -22,6 +24,7 @@
     "vite": "^6.3.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.1"
+    "@playwright/test": "^1.56.1",
+    "sharp": "^0.34.3"
   }
 }

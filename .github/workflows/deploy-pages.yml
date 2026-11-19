@@ -3,6 +3,10 @@ name: Deploy client previews to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    paths:
+      - 'apps/chizh-avto/**'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -17,7 +21,7 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 32
     steps:
       - name: Checkout all client sites
         uses: actions/checkout@v4
@@ -26,6 +30,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Restore npm download cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-chizh-${{ hashFiles('apps/chizh-avto/package.json') }}
 
       - name: Install Chizh-Avto app dependencies
         working-directory: apps/chizh-avto
@@ -45,11 +55,23 @@ jobs:
           CHIZH_MAX_PAGES: 150
         run: npm run sync:official
 
+      - name: Restore processed company photos
+        uses: actions/cache@v4
+        with:
+          path: apps/chizh-avto/public/media
+          key: ${{ runner.os }}-chizh-photo-cache-v2-${{ hashFiles('apps/chizh-avto/src/data/catalog.js', 'apps/chizh-avto/scripts/optimize-media.mjs') }}
+
+      - name: Generate responsive WebP images from Chizh-Avto's real photos
+        working-directory: apps/chizh-avto
+        timeout-minutes: 7
+        run: npm run optimize:media
+
       - name: Build React app with correct Pages base URL
         working-directory: apps/chizh-avto
         run: |
           node scripts/factual-audit.mjs
           npm run build
+          npm run check:budget
           test -s dist/index.html
           test -d dist/assets
 
@@ -79,11 +101,13 @@ jobs:
           test -f "$RUNNER_TEMP/pages/.nojekyll"
 
       - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ runner.temp }}/pages
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build-and-test
     runs-on: ubuntu-latest
     environment:
