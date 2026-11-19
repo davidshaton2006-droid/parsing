@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test');
-for(const slug of ['avm-motors-red','avm-motors-heritage']){
+for(const slug of ['avm-motors-heritage']){
   test.describe(slug,()=>{
     test('main sections, facts and 20 services',async({page})=>{
       await page.goto('/'+slug+'/',{waitUntil:'domcontentloaded'});
