@@ -102,7 +102,7 @@ function Portfolio({full=false,snapshot=emptySnapshot}){
  const [selected,setSelected]=useState(null),[filter,setFilter]=useState(''),[max,setMax]=useState(12);
  const synced=full?snapshot.projectRows.filter(p=>goodSrc(p.photo)&&p.title&&!projects.some(y=>y.title===p.title)).map(p=>({title:p.title,car:'Проект Чиж-Авто',image:p.photo,time:'',price:'',desc:'Проект из официального портфолио компании.',link:p.url})):[];
  const all=[...projects,...synced];const shown=all.filter(x=>(x.title+' '+x.car).toLowerCase().includes(filter.toLowerCase()));
- const cards=full?shown.slice(0,max):projects.slice(0,4);
+ const cards=full?shown.slice(0,max):projects.slice(0,6);
  return <section className={'sc-portfolio'+(full?' full':'')}><div className="sc-wrap"><div className="sc-intro-row sc-portfolio-heading"><Rise><Eyebrow n={full?'':'02'}>Портфолио</Eyebrow><h2 className="sc-h2">Работа говорит<br/>лучше обещаний.</h2></Rise><div><p>Здесь настоящие фотографии и проекты центра. Каждую работу можно открыть и сверить с публикацией Чиж-Авто.</p>{!full&&<SiteLink className="sc-inline-cta" to="/projects">Все проекты <ArrowUpRight size={17}/></SiteLink>}</div></div>
  {full&&<div className="sc-search on-dark"><Search size={18}/><input value={filter} onChange={e=>{setFilter(e.target.value);setMax(12)}} aria-label="Поиск по проектам" placeholder="Найти автомобиль или услугу" type="search"/><span>{shown.length} проектов</span></div>}
  <div className={'sc-work-grid'+(full?' catalog':'')}>{cards.map((p,i)=><WorkTile key={(p.link||p.title)+i} p={p} index={i} large={!full&&i===0} onOpen={setSelected}/>)}</div>
