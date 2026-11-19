@@ -230,3 +230,6 @@ footer a{color:#343935}
  .command-overlay{padding:18px 12px}
  .command-bottom span{max-width:80%}
 }
+
+/* Native HTML hidden attribute must win over editorial grid styles. */
+#services .service-card[hidden]{display:none!important}
