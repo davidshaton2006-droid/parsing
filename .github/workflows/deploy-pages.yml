@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'apps/chizh-avto/**'
+      - 'apps/doctor-car/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -21,7 +22,7 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 32
+    timeout-minutes: 42
     steps:
       - name: Checkout all client sites
         uses: actions/checkout@v4
@@ -83,6 +84,33 @@ jobs:
         working-directory: apps/chizh-avto
         run: npm run test:e2e
 
+      - name: Install Doctor Car React dependencies
+        working-directory: apps/doctor-car
+        run: npm install --no-audit --no-fund
+
+      - name: Build and verify Doctor Car with both theme styles
+        working-directory: apps/doctor-car
+        run: |
+          npm run build
+          npm run check
+          test -s dist/index.html
+          test -d dist/assets
+
+      - name: Test Doctor Car interactions on desktop and mobile
+        working-directory: apps/doctor-car
+        env:
+          CI: true
+        run: npm run test:e2e
+
+      - name: Upload Doctor Car browser test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doctor-car-design-review
+          path: apps/doctor-car/test-results/
+          if-no-files-found: ignore
+          retention-days: 3
+
       - name: Upload browser screenshots for design QA
         if: always()
         uses: actions/upload-artifact@v4
@@ -106,6 +134,9 @@ jobs:
           mkdir -p "$RUNNER_TEMP/pages/chizh-avto"
           cp -a apps/chizh-avto/dist/. "$RUNNER_TEMP/pages/chizh-avto/"
           test -s "$RUNNER_TEMP/pages/chizh-avto/index.html"
+          mkdir -p "$RUNNER_TEMP/pages/doctor-car"
+          cp -a apps/doctor-car/dist/. "$RUNNER_TEMP/pages/doctor-car/"
+          test -s "$RUNNER_TEMP/pages/doctor-car/index.html"
           test -s "$RUNNER_TEMP/pages/index.html"
           test -f "$RUNNER_TEMP/pages/.nojekyll"
 
