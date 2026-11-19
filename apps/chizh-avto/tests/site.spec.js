@@ -7,6 +7,10 @@ test('Editorial home, authentic images and functional navigation',async({page})=
  await expect(page.getByRole('heading',{level:1})).toContainText('комплектация');
  await expect(page.locator('.sc-nav a')).toHaveCount(6);
  await expect(page.locator('.ticker,.scroll-progress,.marquee')).toHaveCount(0);
+ const type=await page.locator('.sc-hero h1').evaluate(el=>({size:parseFloat(getComputedStyle(el).fontSize),family:getComputedStyle(el).fontFamily}));
+ expect(type.size).toBeGreaterThan(38);
+ expect(type.family).toMatch(/Manrope/);
+
  const hero=page.locator('.sc-hero-photo');
  await expect(hero).toHaveAttribute('loading','eager');
  await expect(hero).toHaveAttribute('fetchpriority','high');
