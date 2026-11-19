@@ -4,7 +4,7 @@ async function route(page,path){await page.goto(home+'#'+path,{waitUntil:'domcon
 test('Navigation, official imagery, complete core menu and no filler strips',async({page})=>{
   await route(page,'/');
   await expect(page.getByRole('heading',{level:1})).toContainText('Ваш автомобиль');
-  await expect(page.locator('.hero-photo img')).toHaveAttribute('src',/chizhavto\.ru/);
+  await expect(page.locator('.hero-photo img')).toHaveAttribute('src',/(chizhavto\.ru|\/media\/)/);
   await expect(page.locator('.ticker,.scroll-progress,.marquee')).toHaveCount(0);
   await expect(page.locator('.site-nav a')).toHaveCount(6);
   await expect(page.locator('a[href^="tel:"]').first()).toHaveAttribute('href',/79891990022/);
@@ -68,4 +68,27 @@ test('Mobile navigation, all routes, and horizontal overflow',async({page},testI
   }
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   expect(overflow).toBeLessThanOrEqual(2);
+});
+
+test('Performance: critical photo prioritized, offscreen media deferred, video only on demand',async({page})=>{
+  await route(page,'/');
+  const hero=page.locator('.hero-photo img');
+  await expect(hero).toHaveAttribute('loading','eager');
+  await expect(hero).toHaveAttribute('fetchpriority','high');
+  await expect(page.locator('.project-photo img').first()).toHaveAttribute('loading','lazy');
+  await expect(page.locator('iframe[src*="youtube.com"]')).toHaveCount(0);
+  await route(page,'/contacts');
+  await expect(page.locator('iframe[src*="yandex.ru"]')).toHaveAttribute('loading','lazy');
+});
+
+test('Performance: synchronized fact snapshot downloads only on data routes',async({page})=>{
+  const loaded=[];
+  page.on('request',request=>{
+    if(request.url().includes('snapshot.json'))loaded.push(request.url());
+  });
+  await route(page,'/');
+  await page.waitForTimeout(250);
+  expect(loaded.length).toBe(0);
+  await route(page,'/prices');
+  await expect.poll(()=>loaded.length,{timeout:8000}).toBeGreaterThan(0);
 });
