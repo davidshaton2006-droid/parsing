@@ -11,7 +11,9 @@ test('ST CAR: approved concept structure, services and source accuracy',async({p
   await expect(page.locator('.quick')).toHaveCount(4);
   await expect(page.locator('.demo-banner')).toContainText('Неофициальный');
   await expect(page.locator('.facts-strip')).toContainText('5,0');
-  await expect(page.locator('.real-gallery img')).toHaveCount(2);
+  await expect(page.locator('.real-gallery img')).toHaveCount(3);
+  await expect(page.locator('.extended-list button')).toHaveCount(12);
+  await expect(page.locator('.hero-proof')).toContainText('452 оценки');
   await expect(page.locator('.review-card')).toHaveCount(3);
   await expect(page.locator('a[href="tel:+79186549999"]').first()).toBeAttached();
   await expect(page.locator('a[href*="25853057069"]').first()).toBeAttached();
@@ -33,6 +35,15 @@ test('ST CAR: demo inquiry creates text but never confirms a booking',async({pag
   await expect(page.locator('#form-result')).toHaveValue(/Toyota Corolla 2017/);
   await expect(page.locator('#form-status')).not.toBeEmpty();
   await page.getByRole('button',{name:'Закрыть окно'}).click();
+  await expect(page.locator('#request-dialog')).not.toBeVisible();
+});
+
+test('ST CAR: extended services open a contextual inquiry',async({page})=>{
+  await load(page);
+  await page.getByRole('button',{name:/Подготовить запрос: Эндоскопия двигателя/}).click();
+  await expect(page.locator('#request-dialog')).toBeVisible();
+  await expect(page.locator('#service-select')).toHaveValue('Эндоскопия двигателя');
+  await page.keyboard.press('Escape');
   await expect(page.locator('#request-dialog')).not.toBeVisible();
 });
 
