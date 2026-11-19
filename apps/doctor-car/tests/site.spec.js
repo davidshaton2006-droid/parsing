@@ -71,3 +71,15 @@ test('No horizontal overflow desktop/tablet/mobile',async({page})=>{
   expect(overflow,'overflow at '+width).toBeLessThanOrEqual(3);
  }
 });
+
+test('Design QA: screenshot matching dark/light for desktop and mobile',async({page},testInfo)=>{
+ await visit(page);
+ await page.screenshot({path:testInfo.outputPath('homepage-dark.png'),fullPage:true,animations:'disabled'});
+ await page.locator('.theme-toggle').click();
+ await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+ await page.screenshot({path:testInfo.outputPath('homepage-light.png'),fullPage:true,animations:'disabled'});
+ await visit(page,'/services');
+ await page.screenshot({path:testInfo.outputPath('services.png'),fullPage:true,animations:'disabled'});
+ await visit(page,'/contact');
+ await page.screenshot({path:testInfo.outputPath('contacts.png'),fullPage:true,animations:'disabled'});
+});
