@@ -72,3 +72,14 @@ export const reviews=[
  {name:'Alex_Yan',date:'30.09.2026',quote:'Установили сигнализацию в новый гарантийный автомобиль. Всё чётко, быстро, подробно объяснили. Чистый и аккуратный сервис.'}
 ];
 export const facts={address1:'Краснодар, ул. Жлобы, 115',address2:'Краснодар, ул. Каляева, 89',phone:'+7 (989) 199-00-22',tel:'+79891990022',email:'chizh-avto@mail.ru',hours:'Ежедневно, 09:00–18:00',map:'https://yandex.ru/maps/org/chizh_avto/1266081535/',youtube:'https://www.youtube.com/@chizhauto',video:'https://www.youtube.com/embed/7ocx6Vr29NY?rel=0'};
+
+// Verified images from pages of the official Chizh-Avto portfolio.
+// Used by the approved showroom concept; no stock photographs.
+export const SHOWROOM_PHOTOS={
+ alarm:'https://chizhavto.ru/upload/iblock/969/6yhbznjivvdf2nui33dmgz8mt4lhoxdm.jpg',
+ multimedia:'https://chizhavto.ru/upload/iblock/49c/d0oszn8tuok8bywesw57fefl2pfrd3d9.jpg',
+ insulation:'https://chizhavto.ru/upload/iblock/3f9/o4gje95mghf3uiq94i9lvkptnwdn8g9d.jpg',
+ detail:'https://chizhavto.ru/upload/iblock/815/o2yyqv1fh8ag9lfwra6yj0lj85g5vtpq.jpg',
+ sound:'https://chizhavto.ru/upload/iblock/42e/5d33fruak7wv1sil16e195x7dvw0ojqd.jpeg',
+ toyotaDetail:'https://chizhavto.ru/upload/iblock/de4/ddj9cf6h7i8vmspbmc81vtnekrjqz9sj.jpg',
+};

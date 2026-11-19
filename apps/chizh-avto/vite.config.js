@@ -11,7 +11,7 @@ const heroPreload={
   transformIndexHtml(html){
     try{
       const manifest=JSON.parse(readFileSync(new URL('./src/data/optimized-images.json',import.meta.url),'utf8'));
-      const hero=manifest[PHOTO.hero];
+      const hero=manifest[PHOTO.toyota];
       if(!hero)return html;
       const srcset=hero.smallWidth===hero.largeWidth?
         base+hero.large+' '+hero.largeWidth+'w':
