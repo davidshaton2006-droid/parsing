@@ -13,7 +13,7 @@ test('Approved showroom concept: authentic hero, actual brand and no filler tick
  await expect(hero).toHaveAttribute('loading','eager');
  await expect(hero).toHaveAttribute('fetchpriority','high');
  await expect.poll(()=>hero.evaluate(n=>n.naturalWidth),{timeout:15000}).toBeGreaterThan(0);
- await expect(page.getByRole('navigation',{name:'Основная навигация'}).getByRole('link')).toHaveCount(6);
+ await expect(page.locator('.sv5-nav a')).toHaveCount(6);
 });
 
 test('Hero gallery, service carousel and deep-linked category are functional',async({page})=>{
