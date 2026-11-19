@@ -83,6 +83,15 @@ jobs:
         working-directory: apps/chizh-avto
         run: npm run test:e2e
 
+      - name: Upload browser screenshots for design QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chizh-design-review
+          path: apps/chizh-avto/test-results/
+          if-no-files-found: ignore
+          retention-days: 3
+
       - name: Assemble Pages artifact without app sources or secrets
         shell: bash
         run: |
