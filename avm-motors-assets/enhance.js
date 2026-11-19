@@ -42,4 +42,15 @@ doc.addEventListener('keydown',e=>{
   const activeDialog=lightbox&&!lightbox.hidden?lightbox:(modal&&!modal.hidden?modal:null);if(e.key==='Tab'&&activeDialog){const f=$$('button:not([disabled]),a[href],input:not([disabled]),select,textarea',activeDialog).filter(x=>x.offsetParent!==null);if(!f.length)return;const i=f.indexOf(doc.activeElement);if(e.shiftKey&&i===0){e.preventDefault();f.at(-1).focus();}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();}}
 });
 $('[data-image-fallback]').forEach(img=>{const fallback=()=>{if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.imageFallback;};img.addEventListener('error',fallback);if(img.complete&&img.naturalWidth===0)fallback();});
+/* Motion for JavaScript: optional cinematic polish; every section remains visible without it. */
+if(typeof matchMedia==='function'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+  import('https://cdn.jsdelivr.net/npm/motion@12.0.0/+esm').then(({animate,inView})=>{
+    const image=$('.hero-media img');
+    if(image)animate(image,{scale:[1.04,1]},{duration:1.25,ease:'easeOut'});
+    inView('.section-head h2, .editorial h2, .steps h2, .review-card, .feature-card',el=>{
+      animate(el,{y:[18,0]},{duration:0.72,ease:'easeOut'});
+    },{margin:'0px 0px -8% 0px'});
+  }).catch(()=>{/* Graceful fallback: no animation, same visible content. */});
+}
+
 })();
