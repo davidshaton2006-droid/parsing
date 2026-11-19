@@ -42,6 +42,19 @@ doc.addEventListener('keydown',e=>{
 });
 $$('[data-image-fallback]').forEach(img=>{const fallback=()=>{if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.imageFallback;};img.addEventListener('error',fallback);if(img.complete&&img.naturalWidth===0)fallback();});
 
+
+/* Brand shortcut is a form prefill, not an assertion of service availability. */
+$('[data-vehicle]').forEach(b=>b.addEventListener('click',()=>{
+  openModal('');
+  const field=$('[data-car]',form);
+  if(!field)return;
+  const brand=b.dataset.vehicle||'';
+  requestAnimationFrame(()=>{
+    field.value=brand==='Другая марка'?'':brand+' ';
+    field.focus();
+  });
+}));
+
 /* Command palette: discover services without navigating a dense grid. */
 const command=$('[data-command]'),cmdInput=$('[data-command-input]'),cmdResults=$('[data-command-results]');
 let cmdFocus=null;
