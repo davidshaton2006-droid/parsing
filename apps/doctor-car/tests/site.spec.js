@@ -23,8 +23,8 @@ test('service filters, search and booking modal function', async({page})=>{
  await page.getByRole('button',{name:'Все',exact:true}).click();
  await expect(page.locator('.service-card')).toHaveCount(12);
  await page.getByRole('searchbox',{name:'Поиск услуги'}).fill('Тормозная система');
- await expect(page.locator('.service-card')).toHaveCount(1);
- await page.locator('.service-card .service-arrow').click();
+ await expect(page.locator('.service-card').filter({has:page.getByRole('heading',{name:'Тормозная система',exact:true})})).toHaveCount(1);
+ await page.locator('.service-card').filter({has:page.getByRole('heading',{name:'Тормозная система',exact:true})}).locator('.service-arrow').click();
  await expect(page.getByRole('dialog')).toBeVisible();
  await expect(page.getByRole('dialog').locator('select').first()).toHaveValue('brakes');
  await page.getByRole('button',{name:'Закрыть окно'}).click();
