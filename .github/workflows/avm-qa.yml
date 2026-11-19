@@ -27,8 +27,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: avm-motors-assets/package-lock.json
       - name: Install QA tooling
         working-directory: avm-motors-assets
         run: npm install --no-audit --no-fund
