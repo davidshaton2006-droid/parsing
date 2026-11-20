@@ -50,3 +50,7 @@ dialog{border:0;padding:0;margin:auto;box-shadow:0 45px 140px #08130f99}dialog::
 @media(max-width:780px){.hero h1{font-size:clamp(42px,8vw,65px)}}
 @media(max-width:520px){.hero h1{font-size:clamp(31px,8.5vw,44px)}}
 @media(max-width:360px){.hero h1{font-size:clamp(29px,8.5vw,33px)}}
+
+/* Cross-viewport headline fit: 768px verified browser regression. */
+@media(min-width:521px) and (max-width:1020px){.hero h1{font-size:clamp(41px,7vw,69px);letter-spacing:-.075em}}
+@media(min-width:1021px) and (max-width:1439px){.hero h1{font-size:clamp(58px,6.4vw,89px)}}
