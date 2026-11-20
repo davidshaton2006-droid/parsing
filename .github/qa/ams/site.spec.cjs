@@ -12,7 +12,7 @@ test.describe('AMS Studio premium design',()=>{
    for(const width of [320,360,390,428,768,1024,1440]){
      await page.setViewportSize({width,height:900});
      const v=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,win:innerWidth}));
-     expect(v.scroll,'horizontal overflow at '+width).toBeLessThanOrEqual(v.win+3);
+     if(v.scroll>v.win+3){const offenders=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>{const cs=getComputedStyle(el),r=el.getBoundingClientRect();return cs.display!=='none'&&r.width>0&&r.right>innerWidth+3}).slice(0,10).map(el=>({tag:el.tagName,cls:el.className?.baseVal||el.className,text:(el.textContent||'').slice(0,45),right:Math.round(el.getBoundingClientRect().right)})));throw new Error('horizontal overflow at '+width+' '+v.scroll+' '+JSON.stringify(offenders));}
    }
    expect(errors).toEqual([]);
    await page.setViewportSize(testInfo.project.use.viewport);
