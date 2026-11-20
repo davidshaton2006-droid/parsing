@@ -8,9 +8,9 @@ function closeMenu(){nav?.classList.remove('show');toggle?.setAttribute('aria-ex
 toggle?.addEventListener('click',()=>{const open=nav?.classList.toggle('show');toggle.setAttribute('aria-expanded',String(!!open));toggle.textContent=open?'×':'☰';toggle.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');});
 $$('.nav a').forEach(a=>a.addEventListener('click',closeMenu));
 d.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav?.classList.contains('show'))closeMenu();});
-const knownGood='https://avatars.mds.yandex.net/get-altay/17043127/2a00000199195138360d42e0c7f82bd1cccd/XXL_height';
+const knownGood='./assets/tech-fallback.svg';
 $$('img[data-fallback]').forEach(img=>{
- function fallback(){if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.fallback||knownGood;}
+ function fallback(){if(img.dataset.fallbackDone)return;img.dataset.fallbackDone='1';img.src=img.dataset.fallback||knownGood;img.alt='Иллюстрация проекта AMS: исходное изображение временно недоступно';const gallery=img.closest('.gallery-item');if(gallery){const cap=gallery.querySelector('span');if(cap)cap.textContent='Иллюстрация / фото временно недоступно';gallery.dataset.caption='Концептуальная иллюстрация студии';}const proj=img.closest('.project-card');if(proj){const label=proj.querySelector('.project-info>small');if(label)label.textContent='Концептуальный визуал · ссылка ведёт к подтверждённому проекту';}if(img.closest('.intro-photo')){const label=document.querySelector('.intro-photo-caption');if(label)label.textContent='Концептуальная иллюстрация / фото студии недоступно';}if(img.closest('.hero-image')){const label=document.querySelector('.hero-photo-label');if(label)label.textContent='Концептуальная иллюстрация · исходное фото недоступно';}}
  img.addEventListener('error',fallback);if(img.complete&&!img.naturalWidth)fallback();
 });
 const filters=$$('[data-filter]'),serviceCards=$$('[data-category]');
