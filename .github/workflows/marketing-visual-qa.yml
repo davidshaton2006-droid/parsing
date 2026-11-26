@@ -42,6 +42,11 @@ jobs:
               data[key]='/parsing/marketing/assets/reference/'+key+'.webp'
           p.write_text(json.dumps(data,indent=2))
           PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install local Motion library for browser tests
+        run: bash .github/scripts/marketing-motion-vendor.sh marketing
       - name: Capture and check 36 page and viewport combinations
         run: python .github/scripts/marketing-visual-qa.py
       - name: Publish screenshots and report
