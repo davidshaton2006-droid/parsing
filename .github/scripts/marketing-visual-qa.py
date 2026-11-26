@@ -63,17 +63,32 @@ with TemporaryDirectory() as temp:
                             scroll: document.documentElement.scrollWidth,
                             badImages: [...document.images].filter(i=>!i.classList.contains('reference-object-art')&&!i.hidden&&!i.closest('[hidden]')&&i.getAttribute('src')&&(!i.complete||i.naturalWidth===0)).map(i=>i.src),
                             h1: document.querySelectorAll('h1').length,
-                            nav: document.querySelectorAll('#nav > a').length
+                            nav: document.querySelectorAll('#nav .lgt-track > a').length,
+                            tabs: document.querySelectorAll('#nav .lgt-item').length,
+                            active: document.querySelectorAll('#nav .lgt-item.lgt-on').length
                         })""")
                         row.update(result)
                         assert_page(result["scroll"] <= result["width"] + 1, f"horizontal overflow: {result['scroll']} > {result['width']}")
                         assert_page(not result["badImages"], "missing images: "+str(result["badImages"]))
-                        assert_page(result["h1"] == 1 and result["nav"] == 6, "incorrect headings/navigation")
-                        if width <= 1040:
-                            page.locator(".menu").click()
-                            assert_page(page.locator("#nav").is_visible(), "mobile menu does not open")
-                            page.keyboard.press("Escape")
-                            assert_page(not page.locator("#nav").is_visible(), "mobile menu does not close")
+                        assert_page(result["h1"] == 1 and result["nav"] == 6 and result["tabs"] == 7 and result["active"] == 1, "incorrect headings/navigation")
+                        bar = page.locator("#nav .lgt-track")
+                        assert_page(bar.is_visible(), "liquid glass navigation not visible")
+                        assert_page(bar.locator("a[aria-current=page]").evaluate("(e)=>e.classList.contains('lgt-on')"), "current route not selected")
+                        assert_page(bar.locator(".lgt-item svg").count()==7, "missing navigation icons")
+                        assert_page(bar.evaluate("""e=>[...e.querySelectorAll('.lgt-item')].every(i=>{
+                            const r=i.getBoundingClientRect();return r.width>=33&&r.height>=44&&r.left>=0&&r.right<=innerWidth+1
+                        })"""), "navigation hit areas or overflow")
+                        directions=bar.locator("button.mega-toggle")
+                        directions.click()
+                        assert_page(page.locator("#liquid-glass-directions").is_visible(), "directions menu does not open")
+                        assert_page(directions.get_attribute("aria-expanded")=="true", "directions expanded state")
+                        assert_page(page.locator("#liquid-glass-directions a").count()==6, "missing directions")
+                        assert_page(bar.get_attribute("data-active")=="6", "glass did not move to directions")
+                        page.keyboard.press("Escape")
+                        assert_page(not page.locator("#liquid-glass-directions").is_visible(), "directions menu does not close")
+                        assert_page(bar.locator("a[aria-current=page]").evaluate("(e)=>e.classList.contains('lgt-on')"), "glass did not return to current route")
+                        if width in (320,390,1440):
+                            page.locator("#nav").screenshot(path=str(OUT / f"{name}-{width}-tabbar.png"), animations="disabled")
                         if width == 1440:
                             if name == "home":
                                 assert_page(page.locator("#eco-hours").inner_text() == "50 ч", "default economy calculation")
@@ -159,6 +174,21 @@ with TemporaryDirectory() as temp:
                         assert_page(scene.locator("img.reference-object-art").count()==0, "static art hides animated interface")
                     assert_page(page.locator(".motion-approach").count()==3, "distinct approach scenes")
                     page.locator(".motion-approach").first.screenshot(path=str(OUT / f"motion-approach-{width}.png"), animations="disabled")
+                    # Test the actual spring, including interruption, and navigation to another page.
+                    page.evaluate("window.scrollTo({top:0,behavior:'instant'})")
+                    bar=page.locator("#nav .lgt-track")
+                    lens=bar.locator(".lgt-lens")
+                    before=lens.evaluate("(e)=>e.getBoundingClientRect().left")
+                    bar.locator("button.mega-toggle").click()
+                    page.wait_for_function("(before)=>Math.abs(document.querySelector('.lgt-lens').getBoundingClientRect().left-before)>15",arg=before,timeout=2500)
+                    page.keyboard.press("Escape")
+                    page.wait_for_function("(before)=>Math.abs(document.querySelector('.lgt-lens').getBoundingClientRect().left-before)<2",arg=before,timeout=2500)
+                    bar.locator('a[href$="/catalog/"]').click()
+                    page.wait_for_url(base+"catalog/",timeout=10000)
+                    assert_page(page.locator("#nav .lgt-item.lgt-on").get_attribute("aria-label")=="Каталог","selected tab on destination")
+                    page.go_back(wait_until="load")
+                    page.locator("#nav .lgt-item.lgt-on").wait_for(state="visible")
+                    assert_page(page.locator("#nav .lgt-item.lgt-on").get_attribute("aria-label")=="Главная","selected tab after browser back")
                     report.append({"page":"motion","width":width,"status":"passed"})
                 except Exception as e:
                     failures.append(f"motion/{width}: {e}")
