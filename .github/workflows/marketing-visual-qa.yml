@@ -1,7 +1,7 @@
 name: Marketing visual QA
 on:
   push:
-    branches: [main, marketing-provably-hero, marketing-pinned-approach]
+    branches: [main, marketing-provably-hero, marketing-pinned-approach, marketing-content-revision]
     paths:
       - 'marketing/**'
       - '.github/scripts/marketing-visual-qa.py'
