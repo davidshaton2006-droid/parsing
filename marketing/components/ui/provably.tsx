@@ -3689,7 +3689,7 @@ const HeroCopy = () => {
         </span>
         {COPY.eyebrow}
       </motion.p>
-      <h1 id='cv-hero-title' className='cv-headline font-bold'>
+      <h1 id='cv-hero-title' aria-label={[...COPY.lines, COPY.lastWord].join(' ')} className='cv-headline font-bold'>
         <motion.span className='cv-enter block' {...lineReveal(ENTRANCE, 0)}>
           <KineticText text={COPY.lines[0]} />
         </motion.span>
