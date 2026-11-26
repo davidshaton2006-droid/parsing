@@ -229,3 +229,47 @@ html.js .top nav.liquid-glass-nav .lgt-item:focus-visible{outline:2px solid #86a
  html:has(.liquid-glass-nav){scroll-padding-top:145px}
 }
 @media(prefers-reduced-motion:reduce){.liquid-glass-nav .lgt-icon,.liquid-glass-nav .lgt-label{transition:none!important}.liquid-glass-nav .mega{animation:none!important}}
+
+/* Spotlight Card: 200px surface light, colored 150px border glow, white 100px core.
+   Local coordinates derive from the same viewport pointer for adjacent surfaces.
+   No layout replacement, no image assets, no touch-action override. */
+[data-glow].spotlight-position{position:relative}
+[data-glow]{
+ --spotlight-size:200px;
+ --spot-border:3px;
+ --spot-x:-999px;
+ --spot-y:-999px;
+ --spot-hue:220;
+ --spot-fill-opacity:.10;
+ --spot-color-opacity:1;
+ --spot-white-opacity:.95;
+}
+[data-glow]::before,[data-glow]::after{
+ content:"";position:absolute;inset:0;border-radius:inherit;
+ pointer-events:none;opacity:0;transition:opacity .18s ease;
+}
+[data-glow]::before{
+ z-index:1;
+ background:radial-gradient(var(--spotlight-size) var(--spotlight-size) at var(--spot-x) var(--spot-y),
+ hsl(var(--spot-hue) 100% 70% / var(--spot-fill-opacity)),transparent 100%);
+}
+[data-glow]::after{
+ z-index:2;padding:var(--spot-border);
+ background:
+ radial-gradient(calc(var(--spotlight-size)*.5) calc(var(--spotlight-size)*.5) at var(--spot-x) var(--spot-y),hsl(0 0% 100% / var(--spot-white-opacity)),transparent 100%),
+ radial-gradient(calc(var(--spotlight-size)*.75) calc(var(--spotlight-size)*.75) at var(--spot-x) var(--spot-y),hsl(var(--spot-hue) 100% 50% / var(--spot-color-opacity)),transparent 100%);
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;
+ mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ mask-composite:exclude;
+}
+[data-glow].spotlight-active::before,[data-glow].spotlight-active::after{opacity:1}
+/* Dense rows and nested panels have a quieter rim; preserve their separators. */
+.rows>article[data-glow],.metrics>div[data-glow],.faq>details[data-glow],
+.workspace-kpis>div[data-glow]{--spot-border:2px;--spot-fill-opacity:.07;--spot-color-opacity:.85;--spot-white-opacity:.65}
+.story-tile-v5:nth-child(3)[data-glow],.workspace-demo[data-glow],
+.club-demo[data-glow],.club-screen[data-glow],.club-product[data-glow]{--spot-fill-opacity:.13;--spot-white-opacity:1}
+/* Keep the original keyboard focus affordances and normal touch scrolling. */
+@media(hover:none),(pointer:coarse),(prefers-reduced-motion:reduce){
+ [data-glow]::before,[data-glow]::after{opacity:0!important;transition:none!important}
+}
