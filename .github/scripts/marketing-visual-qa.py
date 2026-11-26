@@ -61,6 +61,12 @@ with TemporaryDirectory() as temp:
                                 assert_page(page.locator("#eco-hours").inner_text() == "50 ч", "default economy calculation")
                                 page.locator("#eco-saving").evaluate("(e)=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}))}")
                                 assert_page("Не покрывается" in page.locator("#eco-payback").inner_text(), "zero saving case")
+                                page.locator('[data-ref-step="4"]').click()
+                                assert_page(page.locator("#ref-step-title").inner_text() == "Запуск", "project timeline")
+                                page.locator('[data-ref-chart="2"]').click()
+                                assert_page(page.locator("#ref-auto-out").inner_text() == "85", "chart scenario")
+                                page.locator(".ref-diag input").first.check()
+                                assert_page(page.locator("#ref-score-ring").get_attribute("aria-label") == "1 из 8", "diagnostic score")
                                 page.locator("[data-workspace=orders]").click()
                                 assert_page("Входящие обращения" in page.locator("#workspace-title").inner_text(), "workspace selector")
                             elif name == "solutions":
