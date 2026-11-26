@@ -417,3 +417,33 @@ html.js .top nav.liquid-glass-nav .lgt-item:focus-visible{outline:2px solid #86a
  [data-pinned-approach] .pinned-connector path{animation:none}
  [data-pinned-approach] .pinned-approach > article.pinned-note{transition:none!important}
 }
+
+/* Content extension: containment for additional long copy and embedded tables.
+   Original colors, shadows, animation and layout rules are retained. */
+[data-content-addition], [data-content-addition] .tile,
+[data-content-addition] .table-wrap, .section .tile > .table-wrap,
+.section .tile .table-wrap, .section .faq .table-wrap,
+.section .tile > details, .section .tile > .calc,
+#business-economics .calc, #business-diagnosis .calc-result,
+#business-diagnosis .calc > div, #request > label {min-width:0;max-width:100%;box-sizing:border-box}
+.section .tile .table-wrap,.section .faq .table-wrap{width:100%;overflow-x:auto}
+.section .tile > ul,.section .tile > p,.section .tile > details{overflow-wrap:anywhere}
+.section .tile > .checks {min-width:0;max-width:100%}
+#business-economics .calc{width:100%;grid-template-columns:minmax(0,1fr)}
+#business-economics input,#business-diagnosis select{width:100%;min-width:0;max-width:100%}
+[data-pinned-source] .pinned-note-body a{max-width:100%;overflow-wrap:anywhere;white-space:normal}
+@media(max-width:767px){
+ [data-content-addition] .actions .btn,.contact .actions .btn{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .section .tile .table-wrap,.section .faq .table-wrap{display:block}
+ #business-diagnosis .calc{grid-template-columns:minmax(0,1fr)}
+}
+
+/* Narrow-screen accommodation for expanded promo and finder copy. */
+@media(max-width:480px){
+ .promo{grid-template-columns:minmax(0,1fr)}
+ .promo>div,.promo .btn,.finder-demo>div,.finder-top>div,.finder-row>span{min-width:0;max-width:100%;overflow-wrap:anywhere;white-space:normal}
+ .promo .btn{width:fit-content}
+ .finder-demo{grid-template-columns:minmax(0,1fr)}
+ .finder-top,.finder-row{flex-wrap:wrap;gap:8px}
+ .finder-top .status-dot,.finder-row .finder-status{white-space:normal;max-width:100%;overflow-wrap:anywhere}
+}
