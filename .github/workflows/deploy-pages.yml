@@ -149,6 +149,9 @@ jobs:
           test -s "$RUNNER_TEMP/pages/index.html"
           test -f "$RUNNER_TEMP/pages/.nojekyll"
 
+      - name: Package Motion JavaScript library
+        run: bash .github/scripts/marketing-motion-vendor.sh "$RUNNER_TEMP/pages/marketing"
+
       - name: Restore original marketing 3D artwork
         uses: actions/cache@v4
         with:
