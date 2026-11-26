@@ -10,9 +10,18 @@ def cyl(c,r,h,m,axis=1): return ('cyl',np.array(c,np.float32),np.array([r,h/2],n
 def ball(c,r,m): return ('ball',np.array(c,np.float32),np.array([r],np.float32),0,m,1)
 def platform(): return [cyl((0,.09,0),2.55,.18,GOLD),cyl((0,.24,0),2.52,.25,WHITE)]
 def scene(key):
-    s=platform()
+    # Card compositions use a different support geometry and tighter camera framing.
+    supports={
+        'ai-core': [box((0,.14,0),(1.55,.14,1.14),WHITE,.12)],
+        'automation-flow': [box((a,.15,.34 if a else -.34),(.62,.15,.56),WHITE,.09) for a in [-1.26,0,1.26]],
+        'commerce': [box((-.42,.14,-.05),(1.66,.14,1.12),WHITE,.12),box((.97,.12,.87),(.65,.12,.55),WHITE,.09)],
+        'mobile-app': [cyl((0,.14,0),1.62,.28,WHITE),cyl((0,.025,0),1.63,.05,GOLD)],
+        'integration-hub': [cyl((0,.13,0),1.91,.26,WHITE),cyl((0,.025,0),1.92,.05,GOLD)],
+        'knowledge-vault': [box((.02,.14,.12),(1.66,.14,.98),WHITE,.10)]
+    }
+    s=supports[key] if key in supports else platform()
     if key=='ai-core':
-        s += [box((0,.54,0),(1.35,.18,1.05),BLUE,.13),box((0,.83,0),(1.05,.13,.82),WHITE,.1),box((0,1.18,0),(.67,.18,.61),GOLD,.12),ball((0,1.72,0),.43,GLASS)]
+        s += [box((0,.46,0),(1.35,.18,1.05),BLUE,.13),box((0,.83,0),(1.05,.13,.82),WHITE,.1),box((0,1.18,0),(.67,.18,.61),GOLD,.12),ball((0,1.72,0),.43,GLASS)]
         for a in [-1.06,1.06]:
             for z in [-.70,.70]:
                 s += [box((a,.87,z),(.21,.16,.23),WHITE,.06),ball((a,1.14,z),.12,GOLD)]
@@ -89,9 +98,11 @@ def sdf(p,objects,materials=False):
 def unit(v): return v/np.linalg.norm(v)
 def render(key,w,h):
     objects=scene(key); forward=unit(np.array([-5.,-3.7,-7.])); right=unit(np.cross(forward,[0,1,0])); up=np.cross(right,forward)
-    target=np.array([0.,.95,0.]); origin=target-forward*8
+    is_card=key in ('ai-core','automation-flow','commerce','mobile-app','integration-hub','knowledge-vault')
+    target=np.array([0.,1.12 if is_card else .95,0.]); origin=target-forward*8
+    span=4.85 if is_card else 6.2
     x,y=np.meshgrid((np.arange(w)+.5)/w-.5,.5-(np.arange(h)+.5)/h)
-    p=(origin+right*x.ravel()[:,None]*6.2+up*y.ravel()[:,None]*6.2*h/w).astype(np.float32)
+    p=(origin+right*x.ravel()[:,None]*span+up*y.ravel()[:,None]*span*h/w).astype(np.float32)
     f=forward.astype(np.float32); t=np.zeros(len(p),np.float32); active=np.arange(len(p)); hit=np.zeros(len(p),bool)
     for _ in range(100):
         if not len(active): break
