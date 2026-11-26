@@ -358,8 +358,7 @@ html.js .top nav.liquid-glass-nav .lgt-item:focus-visible{outline:2px solid #86a
  gap:46px clamp(36px,10vw,150px);align-items:start;justify-items:center;
  max-width:1000px;margin:0 auto;padding:46px clamp(24px,6vw,92px) 56px;
  border:0!important;border-radius:22px;box-shadow:none!important;overflow:visible!important;
- background:linear-gradient(90deg,#fff 0%,transparent 17%,transparent 83%,#fff 100%),
- repeating-linear-gradient(0deg,transparent 0 31px,#20233a12 31px 32px),#fff!important
+ background:transparent!important
 }
 [data-pinned-approach] .pinned-approach::before,[data-pinned-approach] .pinned-approach::after,
 [data-pinned-approach] .pinned-approach > article.pinned-note::before,[data-pinned-approach] .pinned-approach > article.pinned-note::after{content:none!important}
