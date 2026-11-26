@@ -1,0 +1,60 @@
+name: Actions failure inventory
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/actions-failure-inventory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  statuses: write
+
+concurrency:
+  group: actions-failure-inventory
+  cancel-in-progress: true
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Expose audit run link and inventory failed jobs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo=context.repo;
+            const url=process.env.GITHUB_SERVER_URL+'/'+process.env.GITHUB_REPOSITORY+'/actions/runs/'+context.runId;
+            const status=state=>github.rest.repos.createCommitStatus({...repo,sha:context.sha,state,context:'actions-failure-inventory',target_url:url,description:state==='pending'?'Reading recent Actions runs':'Inventory complete; deployment not certified'});
+            await status('pending');
+            try {
+              const runs=await github.paginate(github.rest.actions.listWorkflowRunsForRepo,{...repo,per_page:100},(response,done)=>{
+                if(response.data.workflow_runs.length<100)done();
+                return response.data.workflow_runs;
+              });
+              const latest=runs.slice(0,100);
+              const inventory=[];
+              for(const run of latest){
+                const item={id:run.id,name:run.name,sha:run.head_sha,event:run.event,status:run.status,conclusion:run.conclusion,url:run.html_url,jobs:[]};
+                if(['failure','timed_out','action_required','startup_failure'].includes(run.conclusion)){
+                  try{
+                    const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,per_page:100});
+                    item.jobs=jobs.filter(j=>j.conclusion!=='success'&&j.conclusion!=='skipped').map(j=>({id:j.id,name:j.name,conclusion:j.conclusion,steps:j.steps?.filter(s=>['failure','timed_out','cancelled'].includes(s.conclusion)).map(s=>({name:s.name,conclusion:s.conclusion}))}));
+                  }catch(e){item.inventoryError=String(e.message);}
+                }
+                inventory.push(item);
+                core.info(JSON.stringify(item));
+              }
+              require('fs').writeFileSync('actions-inventory.json',JSON.stringify(inventory,null,2));
+              await core.summary.addHeading('Recent Actions runs (up to 100)').addTable([[{data:'Workflow',header:true},{data:'Run',header:true},{data:'Status',header:true},{data:'Failed steps',header:true}],...inventory.map(i=>[i.name,String(i.id),String(i.conclusion||i.status),i.jobs.flatMap(j=>j.steps?.map(s=>s.name)||[j.name]).join(', ')])]).write();
+              await status('success');
+            }catch(e){await status('failure');throw e;}
+      - name: Upload inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actions-inventory
+          path: actions-inventory.json
+          if-no-files-found: warn
+          retention-days: 3
