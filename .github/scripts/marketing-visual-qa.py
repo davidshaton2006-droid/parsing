@@ -69,6 +69,8 @@ with TemporaryDirectory() as temp:
                             active: document.querySelectorAll('#nav .lgt-item.lgt-on').length
                         })""")
                         row.update(result)
+                        if result["scroll"] > result["width"] + 1:
+                            row["overflow_elements"]=page.evaluate("""()=>[...document.querySelectorAll('main *')].filter(e=>{const b=e.getBoundingClientRect();return b.right>innerWidth+1&& !e.closest('.table-wrap')}).slice(0,20).map(e=>({tag:e.tagName,cls:String(e.className).slice(0,90),right:Math.round(e.getBoundingClientRect().right),text:e.textContent.trim().slice(0,60)}))""")
                         assert_page(result["scroll"] <= result["width"] + 1, f"horizontal overflow: {result['scroll']} > {result['width']}")
                         assert_page(not result["badImages"], "missing images: "+str(result["badImages"]))
                         assert_page(result["h1"] == 1 and result["nav"] == 6 and result["tabs"] == 7 and result["active"] == 1, "incorrect headings/navigation")
@@ -81,7 +83,7 @@ with TemporaryDirectory() as temp:
                         expected_notes=8 if name=="home" else 4 if name in ("catalog","pricing") else 3
                         pinned=page.locator("section[data-pinned-approach]")
                         assert_page(pinned.count()==1,"pinned style must target only the requested section")
-                        assert_page(pinned.locator(".section-head .eyebrow").inner_text()==("Возможности развития." if name=="home" else "Практический подход"),"wrong section modified")
+                        assert_page(pinned.locator(".section-head .eyebrow").text_content().strip()==("Возможности развития." if name=="home" else "Практический подход"),"wrong section modified")
                         assert_page(pinned.locator(".pinned-note").count()==expected_notes,"incorrect pinned card count")
                         assert_page(pinned.locator(".pinned-note-frame .pinned-pin").count()==expected_notes,"pin icons missing")
                         assert_page(pinned.locator(".pinned-note-body h3").count()==expected_notes and pinned.locator(".pinned-note-body p").count()>=expected_notes,"card content missing")
