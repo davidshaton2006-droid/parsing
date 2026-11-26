@@ -78,6 +78,19 @@ with TemporaryDirectory() as temp:
                         assert_page(page.locator("[data-glow]").count()>=8,"missing page-wide spotlight surfaces")
                         assert_page(page.locator(".tile:not([data-glow]),.story-tile-v5:not([data-glow]),.ref-project:not([data-glow])").count()==0,"uncovered card")
                         assert_page(page.locator(".hero[data-glow]").count()==1,"hero spotlight")
+                        expected_notes=4 if name in ("home","catalog","pricing") else 3
+                        pinned=page.locator("section[data-pinned-approach]")
+                        assert_page(pinned.count()==1,"pinned style must target only the requested section")
+                        assert_page(pinned.locator(".section-head .eyebrow").inner_text()==("С чем ко мне приходят" if name=="home" else "Практический подход"),"wrong section modified")
+                        assert_page(pinned.locator(".pinned-note").count()==expected_notes,"incorrect pinned card count")
+                        assert_page(pinned.locator(".pinned-note-frame .pinned-pin").count()==expected_notes,"pin icons missing")
+                        assert_page(pinned.locator(".pinned-note-body h3").count()==expected_notes and pinned.locator(".pinned-note-body p").count()==expected_notes,"card content missing")
+                        assert_page(page.locator(".pinned-note").count()==expected_notes,"unrelated cards modified")
+                        assert_page(pinned.locator(".pinned-connector").is_visible()==(width>=768),"connector responsive state")
+                        assert_page(pinned.locator(".pinned-connector path").evaluate("(e)=>getComputedStyle(e).animationName")=="none","reduced motion connector")
+                        if width in (390,1440):
+                            pinned.screenshot(path=str(OUT / f"{name}-{width}-pinned-approach.png"),animations="disabled")
+
                         assert_page(page.locator("[data-slot=provably]").count()==1,"missing shared Provably hero")
                         assert_page(page.locator(".cv-cert").count()==3,"missing page-specific stack")
                         switch=page.locator(".cv-toggle")
@@ -137,6 +150,10 @@ with TemporaryDirectory() as temp:
                             elif name == "solutions":
                                 page.locator("[data-journey='1']").click()
                                 assert_page("Доставка к месту" in page.locator(".journey-steps-v5").inner_text(), "journey selector")
+                                page.locator(".journey-steps-v5 .pinned-note").last.wait_for(state="visible")
+                                assert_page(page.locator(".journey-steps-v5 .pinned-note").count()==3,"scenario changes retain pinned layout")
+                                assert_page(page.locator(".journey-steps-v5 .pinned-connector").count()==1,"scenario connector preserved")
+
                                 page.locator('[data-club-add="0"]').click()
                                 page.locator('[data-club-add="0"]').click()
                                 page.locator('[data-club-add="1"]').click()
@@ -215,6 +232,12 @@ with TemporaryDirectory() as temp:
                         assert_page(card.evaluate("(e)=>{const s=getComputedStyle(e,'::after');return s.maskImage.includes('linear-gradient') && /exclude|xor/.test(s.maskComposite+' '+s.webkitMaskComposite)}"),"border mask is missing")
                         page.locator(".service-bento").screenshot(path=str(OUT/"spotlight-desktop.png"),animations="disabled")
                         page.mouse.move(1,1)
+                    if width==1440:
+                        connector=page.locator("[data-pinned-approach] .pinned-connector path")
+                        assert_page(connector.evaluate("(e)=>e.getTotalLength()>0"),"pinned connector geometry")
+                        assert_page(connector.evaluate("(e)=>getComputedStyle(e).animationName")=="pinned-connector-motion","animated dashed connector")
+                        dash=connector.evaluate("(e)=>getComputedStyle(e).strokeDashoffset")
+                        page.wait_for_function("({e,dash})=>getComputedStyle(e).strokeDashoffset!==dash",arg={"e":connector.element_handle(),"dash":dash},timeout=2500)
                     # Test the actual spring, including interruption, and navigation to another page.
                     page.evaluate("window.scrollTo({top:0,behavior:'instant'})")
                     bar=page.locator("#nav .lgt-track")
