@@ -10,7 +10,7 @@ ROOT = Path.cwd()
 OUT = ROOT / "test-results" / "marketing-visual"
 OUT.mkdir(parents=True, exist_ok=True)
 PAGES = ["", "catalog/", "solutions/", "pricing/", "partners/", "portfolio/"]
-WIDTHS = [320, 390, 768, 900, 1024, 1440]
+WIDTHS = [320, 375, 390, 768, 900, 1024, 1440, 1920]
 report, failures = [], []
 
 def assert_page(condition, label):
@@ -74,6 +74,19 @@ with TemporaryDirectory() as temp:
                         assert_page(result["scroll"] <= result["width"] + 1, f"horizontal overflow: {result['scroll']} > {result['width']}")
                         assert_page(not result["badImages"], "missing images: "+str(result["badImages"]))
                         assert_page(result["h1"] == 1 and result["nav"] == 6 and result["tabs"] == 7 and result["active"] == 1, "incorrect headings/navigation")
+                        scale = page.evaluate("""() => {
+                            const style = (s) => getComputedStyle(document.querySelector(s));
+                            return {body:parseFloat(style('body').fontSize), title:parseFloat(style('h1').fontSize),
+                                titleWeight:parseInt(style('h1').fontWeight), heading:parseFloat(style('.section-head h2').fontSize),
+                                icon:parseFloat(style('#nav .lgt-icon').width), button:parseFloat(style('.cv-actions a').minHeight),
+                                container:document.querySelector('main.wrap').getBoundingClientRect().width}
+                        }""")
+                        row["expanded_scale"] = scale
+                        assert_page(scale["body"] >= 17 and scale["title"] >= 29 and scale["heading"] >= 30 and scale["titleWeight"] >= 750, "expanded typography")
+                        assert_page(scale["icon"] >= 25 and scale["button"] >= 52, "expanded navigation and CTA")
+                        if width == 1920:
+                            assert_page(scale["container"] >= 1500, "wide desktop container")
+
                         bar = page.locator("#nav .lgt-track")
                         assert_page(bar.is_visible(), "liquid glass navigation not visible")
                         assert_page(page.locator("html").get_attribute("data-spotlight")=="ready","Spotlight controller not ready")

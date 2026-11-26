@@ -447,3 +447,235 @@ html.js .top nav.liquid-glass-nav .lgt-item:focus-visible{outline:2px solid #86a
  .finder-top,.finder-row{flex-wrap:wrap;gap:8px}
  .finder-top .status-dot,.finder-row .finder-status{white-space:normal;max-width:100%;overflow-wrap:anywhere}
 }
+
+
+/* Shaton Digital — expanded responsive scale, preserving the existing visual system.
+   All six routes use this shared stylesheet. Keep diagrams and decorative art in their
+   own coordinate systems; increase readable UI without browser zoom or transforms. */
+:root{
+ --sd-body:clamp(17px,1.28vw,20px);
+ --sd-h2:clamp(34px,3.65vw,60px);
+ --sd-h3:clamp(24px,2.15vw,34px);
+ --sd-label:clamp(15px,1.15vw,17px);
+ --sd-gap:clamp(16px,1.65vw,28px);
+ --sd-pad:clamp(20px,2.2vw,36px);
+ --sd-section:clamp(66px,6.2vw,104px);
+}
+body{font-size:var(--sd-body);font-weight:500;line-height:1.57}
+.wrap,.top,.foot{max-width:1600px;padding-inline:clamp(18px,3vw,52px)}
+main.wrap{min-width:0}
+h1,h2,h3,h4{font-weight:800;overflow-wrap:break-word}
+h1,.hero h1{font-size:clamp(42px,5.35vw,86px);font-weight:850;line-height:1.06;letter-spacing:-.046em;max-width:none}
+h2,.section-head h2,.contact h2,.promo h2{font-size:var(--sd-h2);font-weight:800;line-height:1.12;letter-spacing:-.042em}
+h3,.tile h3,.story-tile-v5 h3,.ref-project h3,.portfolio-grid>.tile h3,.service-bento .tile h3,.service-bento>.tile:nth-child(-n+2)>h3,.journey-steps-v5 h3,.rows h3{font-size:var(--sd-h3);font-weight:780;line-height:1.19}
+h4{font-size:clamp(19px,1.55vw,25px);line-height:1.3}
+p,li,dd,td{font-weight:500}
+strong,b,th{font-weight:750}
+.section{padding-top:var(--sd-section)}
+.section-head{max-width:1080px;margin-bottom:clamp(24px,3vw,44px)}
+.section-head p,.lead,.hero .lead{font-size:clamp(17px,1.45vw,22px);font-weight:500;line-height:1.58}
+.section-head p{max-width:75ch;margin-top:16px}
+.eyebrow,.hero .eyebrow,.section-head .eyebrow{font-size:clamp(13px,1.1vw,16px);font-weight:750;letter-spacing:.065em;margin-bottom:15px}
+.eyebrow i{width:10px;height:10px;flex:none}
+.small,.metrics span,.tile .small,.tools span,.project-preview small,.project-preview span{font-size:clamp(13px,1vw,15px);font-weight:500;line-height:1.5}
+.checks,.hero .checks{font-size:var(--sd-label);font-weight:550;gap:10px 18px}
+.actions{gap:14px;margin-top:30px}
+.btn,.hero .actions .btn{font-size:clamp(15px,1.2vw,18px);font-weight:750;min-height:54px;padding:15px 23px;gap:12px;border-radius:11px;line-height:1.35;white-space:normal;overflow-wrap:anywhere;max-width:100%}
+.btn>span{font-size:1.2em;flex:none}
+.textlink,.service-bento .tile .textlink{font-size:var(--sd-label);font-weight:750;min-height:44px;line-height:1.4}
+.grid,.service-bento,.ref-project-grid,.experience,.partner-presets{gap:var(--sd-gap)}
+.tile,.service-bento>.tile,.service-bento>.tile:nth-child(-n+2),.service-bento.is-filtered>.tile{padding:var(--sd-pad);gap:clamp(12px,1.2vw,19px);min-width:0;border-radius:20px}
+.tile p,.story-tile-v5 p,.ref-project p,.journey-steps-v5 p,.rows p{font-size:var(--sd-body);font-weight:500;line-height:1.55}
+.tile .num,.num,.service-bento .tile>.num{width:clamp(42px,3.5vw,54px);height:clamp(42px,3.5vw,54px);font-size:clamp(15px,1.2vw,18px);font-weight:800;border-radius:11px}
+.pill,.tile .pill{font-size:clamp(12px,1.05vw,15px);font-weight:700;padding:7px 12px}
+.metrics>div{padding:var(--sd-pad);gap:9px;min-width:0}
+.metrics b{font-size:clamp(24px,2.8vw,43px);font-weight:800;overflow-wrap:anywhere}
+.tools{font-size:var(--sd-label);gap:16px;padding-block:32px 20px}
+.rows article,.faq details{padding:var(--sd-pad);gap:18px}
+.faq summary{font-size:clamp(18px,1.5vw,23px);font-weight:750;line-height:1.38}
+.faq details p{margin-top:14px}
+.promo,.contact{padding:clamp(24px,3.2vw,50px);gap:var(--sd-gap);margin-top:var(--sd-section);min-width:0}
+.promo>div,.contact>div,.contact form,.calc>div,.economy-panel>div{min-width:0}
+.big-number{font-size:clamp(70px,10vw,155px);font-weight:850}
+.contactlinks{font-size:var(--sd-label);font-weight:700;gap:12px;overflow-wrap:anywhere}
+form{gap:17px}
+label{font-size:var(--sd-label);font-weight:650;gap:9px}
+input:not([type=checkbox]):not([type=range]),textarea,select{font-size:clamp(16px,1.2vw,18px);font-weight:500;min-height:52px;padding:12px 15px;max-width:100%}
+textarea{min-height:120px}
+.consent{font-size:clamp(13px,1.05vw,15px);font-weight:500;line-height:1.5}
+.consent input,.diag-list input,.finder-check input{width:21px;height:21px;min-height:0;flex:none}
+.calc,.calc-result,.economy-panel,.economy-result,.audit-offer,.audit-board,.experience>article,.ref-process-panel,.ref-chart-board,.tier-simulator,.tier-result,.showcase,.summarycard,.finder-panel,.finder-results{padding:var(--sd-pad);gap:var(--sd-gap);min-width:0}
+.calc-result>strong,.summarycard strong{font-size:clamp(32px,4.1vw,60px);font-weight:800}
+.calc-result p,.calc-result dl div,.commission-bars div,.finder-detail-box p,.ref-score-wrap p,.ref-score-wrap b{font-size:var(--sd-label);font-weight:550}
+.calc-result dl div{padding:14px 0;flex-wrap:wrap}
+.calc-result dd{font-weight:750}
+td,th{font-size:var(--sd-label);padding:15px 22px;line-height:1.4}
+th{font-weight:750}
+.table-wrap{max-width:100%;overflow-x:auto}
+.flow{padding:var(--sd-pad);gap:15px}
+.flow span{padding:14px 18px;font-weight:700}
+.filters{gap:var(--sd-gap);margin-bottom:24px}
+.filters label{min-width:0}
+.story-tile-v5{padding:var(--sd-pad) var(--sd-pad) 100px;min-height:275px}
+.ref-project{padding:var(--sd-pad);gap:14px}
+.ref-project-num{font-size:13px;font-weight:750}
+.ref-project-art:not(.has-preview),.project-preview:not(.has-preview){min-height:200px}
+.project-preview b{font-size:clamp(27px,2.8vw,40px);font-weight:800}
+.feature-art{height:clamp(150px,16vw,240px)}
+.service-bento .tile>.service-scene-v6{min-height:clamp(190px,17vw,270px)}
+.service-bento>.tile:nth-child(-n+2){column-gap:20px;row-gap:13px}
+.service-bento>.tile:nth-child(-n+2)>.service-scene-v6{min-height:240px}
+.service-bento .service-scene-v6[data-ref-art].has-object-art>.scene-label-v6{font-size:clamp(11px,1vw,14px);font-weight:700}
+.service-bento .tile .scene-label-v6{font-size:clamp(11px,1vw,14px);font-weight:700}
+.ref-step-tabs button,.ref-chart-controls button,.journey-tabs-v5 button,.showcase-tabs button,.showcase-device button,.demo-controls button,.workspace-nav button,.stage-flow span{font-size:var(--sd-label);font-weight:650;min-height:48px;padding:12px 15px;white-space:normal;overflow-wrap:anywhere}
+.ref-step-tabs button span,.ref-chart-legend,.ref-node span,.finder-top small,.finder-row small,.finder-detail-box small{font-size:clamp(12px,1vw,15px);font-weight:550}
+.ref-process-copy h3,.showcase-info h3,.club-heading h3{font-size:clamp(28px,3vw,44px);font-weight:800}
+.ref-node{font-size:var(--sd-label);padding:13px}
+.ref-diag .diag-list label{font-size:var(--sd-label);min-height:50px;padding:12px}
+.ref-chart-end>div{font-size:var(--sd-label);padding:16px;min-width:0}
+.ref-chart-end b{font-size:clamp(26px,2.5vw,38px);font-weight:800}
+.bubble{font-size:var(--sd-label);padding:15px 18px;font-weight:500}
+.workspace-demo{padding:clamp(12px,1.7vw,24px);gap:18px}
+.partner-presets button{padding:var(--sd-pad);min-width:0;gap:8px}
+.partner-presets button b,.finder-top b,.club-cart h3{font-size:clamp(23px,2vw,32px);font-weight:800}
+.partner-presets button small,.partner-presets button span,.finder-panel label,.finder-status{font-size:var(--sd-label);font-weight:550}
+.finder-demo,.club-demo{gap:var(--sd-gap);padding:clamp(12px,1.6vw,24px)}
+.finder-row,.finder-detail-box,.club-product{padding:clamp(12px,1.3vw,20px)}
+.club-product b{font-size:clamp(15px,1.2vw,19px);font-weight:750}
+.club-product small{font-size:13px}
+.club-product-bottom button{width:42px;min-height:42px;font-size:25px}
+.club-cart-row{font-size:var(--sd-label)}
+.foot{padding-block:36px 44px;gap:30px}
+.foot>div{font-size:var(--sd-label);font-weight:550}
+.brand b,.top:has(.liquid-glass-nav)>.brand b{font-size:clamp(21px,1.7vw,28px);font-weight:800}
+.brand small,.top:has(.liquid-glass-nav)>.brand small{font-size:clamp(12px,1vw,14px);font-weight:550}
+.head-cta{font-size:15px}
+.head-cta .btn{font-size:15px;padding:12px 17px;min-height:48px}
+.top:has(.liquid-glass-nav){min-height:106px;gap:18px}
+html.js .top nav.liquid-glass-nav,html.js .top nav.liquid-glass-nav:not(.open){max-width:810px;height:100px}
+.liquid-glass-nav .lgt-track{--pill-h:68px;--lens-over:12px}
+html.js .top nav.liquid-glass-nav .lgt-item .lgt-icon{width:29px;height:29px}
+html.js .top nav.liquid-glass-nav .lgt-item .lgt-label{font-size:12px;font-weight:650;bottom:9px}
+html.js .top nav.liquid-glass-nav .lgt-item.lgt-on .lgt-icon{transform:translateY(-8px)}
+.liquid-glass-nav .mega:not([hidden]){width:min(810px,calc(100vw - 32px));gap:12px;padding:18px}
+.liquid-glass-nav .mega a{font-size:var(--sd-label);padding:16px}
+.liquid-glass-nav .mega a small{font-size:13px;font-weight:500}
+html:has(.liquid-glass-nav){scroll-padding-top:126px}
+.provably-mount .cv-panel{min-height:clamp(760px,90svh,1060px)}
+.provably-mount .cv-headline{--cv-hs:clamp(40px,5.8vw,88px);font-weight:850;line-height:1.075;max-width:950px}
+.provably-mount .cv-headline-last{font-size:1.08em}
+.provably-mount .cv-headline-last>span:last-child{overflow-wrap:anywhere}
+.provably-mount .cv-eyebrow{font-size:clamp(12px,1.05vw,15px);font-weight:750;line-height:1.4}
+.provably-mount .cv-subtext{font-size:clamp(17px,1.5vw,22px);font-weight:500;max-width:42em;line-height:1.55}
+.provably-mount .cv-page-checks{max-width:840px;gap:12px 20px}
+.provably-mount .cv-page-checks li{font-size:clamp(14px,1.1vw,17px);font-weight:550}
+.provably-mount .cv-page-checks svg{width:18px;height:18px}
+.provably-mount .cv-actions a{font-size:clamp(16px,1.3vw,19px);font-weight:750;min-height:56px;padding:15px 24px;white-space:normal;line-height:1.35}
+.provably-mount .cv-cert-wrap,.provably-mount .cv-stats-card{font-size:16px}
+.provably-mount .cv-dialog h2{font-size:clamp(25px,3vw,36px);font-weight:800}
+[data-pinned-approach] .pinned-approach{max-width:1280px;gap:54px clamp(40px,7vw,104px);padding:50px clamp(24px,5vw,80px) 64px}
+[data-pinned-approach] .pinned-approach>article.pinned-note{width:min(100%,390px);max-width:390px}
+[data-pinned-approach] .pinned-note-body{padding:22px;min-height:190px}
+[data-pinned-approach] .pinned-note-body h3{font-size:clamp(23px,2.2vw,30px)!important;font-weight:800;line-height:1.16}
+[data-pinned-approach] .pinned-note-body p{font-size:clamp(16px,1.2vw,18px)!important;font-weight:500;line-height:1.48}
+[data-pinned-approach] .pinned-pin{width:40px;height:40px}
+[data-pinned-approach] .pinned-number{font-size:44px}
+[data-pinned-approach] .pinned-note-body a{margin-top:12px}
+@media(min-width:1500px){
+ .provably-mount .cv-headline{max-width:870px}
+ .provably-mount .cv-panel>section>.relative{min-height:540px}
+ .provably-mount .cv-stats-card{max-width:220px}
+}
+@media(max-width:1499px){
+ /* Keep larger floating cards out of the headline's reading area on laptops/tablets. */
+ .provably-mount .cv-panel{min-height:0}
+ .provably-mount .cv-panel>section{padding:56px 0 28px}
+ .provably-mount .cv-panel>section>.relative{min-height:0}
+ .provably-mount .cv-floats{display:flex;position:relative;inset:auto;align-items:center;justify-content:center;flex-wrap:wrap;gap:32px;margin:48px auto 10px;padding:0 18px 28px;pointer-events:auto}
+ .provably-mount .cv-floats>.cv-float:nth-child(n){position:relative;inset:auto;pointer-events:auto}
+ .provably-mount .cv-floats>svg,.provably-mount .cv-floats>.cv-float:has(>svg),.provably-mount .cv-badge{display:none}
+ .provably-mount .cv-arrow{position:relative;inset:auto;display:inline-flex;vertical-align:middle;translate:0 -2px;margin-left:8px;width:44px;height:44px}
+}
+@media(max-width:1180px){
+ .top:has(.liquid-glass-nav){min-height:0;gap:0;padding-block:10px 5px}
+ html.js .top nav.liquid-glass-nav,html.js .top nav.liquid-glass-nav:not(.open){height:98px}
+ html:has(.liquid-glass-nav){scroll-padding-top:180px}
+}
+@media(max-width:1024px){
+ .grid:not(.service-bento),.ref-project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .service-bento>.tile:nth-child(-n+2){column-gap:14px}
+ .ref-step-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .contact,.calc,.economy-panel{grid-template-columns:minmax(0,1fr)}
+ .workspace-demo{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:767px){
+ :root{--sd-body:17px;--sd-h2:clamp(30px,6.8vw,42px);--sd-h3:clamp(23px,5.3vw,28px);--sd-label:15px;--sd-pad:20px;--sd-gap:16px;--sd-section:62px}
+ .wrap,.foot{padding-inline:16px}
+ .grid:not(.service-bento),.ref-project-grid,.experience,.service-bento,.promo,.contact,.calc,.economy-panel,.partner-presets,.finder-demo,.club-demo{grid-template-columns:minmax(0,1fr)}
+ .service-bento>.tile,.service-bento>.tile:nth-child(-n+2),.service-bento.is-filtered>.tile{grid-column:1/-1;display:flex;flex-direction:column;min-height:0}
+ .service-bento>.tile:nth-child(-n+2)>.service-scene-v6{width:100%;height:auto;min-height:190px}
+ .service-bento .tile>.service-scene-v6{min-height:190px}
+ .tile,.service-bento>.tile,.service-bento>.tile:nth-child(-n+2),.service-bento.is-filtered>.tile{padding:20px;gap:13px}
+ .contact,.promo,.calc,.calc-result,.economy-panel,.economy-result,.ref-chart-board,.ref-process-panel,.finder-panel,.finder-results{padding:20px;gap:16px}
+ .hero:not(.provably-shell){padding:20px}
+ .hero h1{font-size:clamp(35px,8.2vw,52px)}
+ .section-head h2{text-wrap:wrap}
+ .actions .btn,.hero .actions .btn{min-width:0;flex:1 1 190px;padding:14px 18px}
+ .btn{min-height:52px}
+ .metrics>div{padding:16px}
+ .metrics b{font-size:clamp(23px,5.5vw,32px)}
+ .rows article{padding:18px;gap:12px}
+ .faq details{padding:18px}
+ .story-tile-v5{padding:20px 20px 92px;min-height:250px}
+ .ref-step-tabs button{padding:10px 8px;font-size:14px}
+ .filters{flex-direction:column}
+ td,th{padding:12px 16px}
+ .finder-row{display:flex;flex-wrap:wrap}
+ .finder-status{max-width:100%}
+ .peak-chart-grid{grid-template-columns:minmax(0,1fr)}
+ .provably-mount .cv-headline{--cv-hs:clamp(31px,7.6vw,49px);line-height:1.12;letter-spacing:-.042em}
+ .provably-mount .cv-panel>section{padding:36px 0 20px}
+ .provably-mount .cv-subtext{font-size:17px;margin-top:24px}
+ .provably-mount .cv-page-checks{gap:9px;flex-direction:column;align-items:center}
+ .provably-mount .cv-page-checks li{font-size:14px}
+ .provably-mount .cv-actions{flex-wrap:wrap;justify-content:center}
+ .provably-mount .cv-actions a{font-size:16px;padding:14px 18px;min-height:52px}
+ .provably-mount .cv-arrow{width:36px;height:36px;min-width:36px}
+ .provably-mount .cv-cert-wrap{font-size:15px}
+ .provably-mount .cv-stats-card{font-size:15px}
+ .provably-mount .cv-floats{gap:28px;margin-top:38px}
+ [data-pinned-approach] .pinned-approach{gap:36px;padding:30px 13px 42px;max-width:100%}
+ [data-pinned-approach] .pinned-approach>article.pinned-note{width:min(100%,390px)}
+ [data-pinned-approach] .pinned-note-body{padding:18px;min-height:0}
+ [data-pinned-approach] .pinned-pin{width:36px;height:36px}
+ [data-pinned-approach] .pinned-number{font-size:40px}
+}
+@media(max-width:540px){
+ .top:has(.liquid-glass-nav){padding:8px 10px 4px}
+ .top:has(.liquid-glass-nav)>.brand b{font-size:21px}
+ .top:has(.liquid-glass-nav)>.brand small{font-size:11px}
+ html.js .top nav.liquid-glass-nav,html.js .top nav.liquid-glass-nav:not(.open){height:87px;padding-inline:3px}
+ .liquid-glass-nav .lgt-track{--pill-h:62px;--lens-over:9px}
+ html.js .top nav.liquid-glass-nav .lgt-item .lgt-icon{width:25px;height:25px}
+ html.js .top nav.liquid-glass-nav .lgt-item .lgt-label{font-size:10px;bottom:7px}
+ .liquid-glass-nav .mega:not([hidden]){padding:8px;gap:7px;max-height:calc(100dvh - 170px)}
+ .liquid-glass-nav .mega a{font-size:13px;padding:12px 10px}
+ html:has(.liquid-glass-nav){scroll-padding-top:162px}
+ .provably-mount .cv-headline{--cv-hs:clamp(30px,7.7vw,42px)}
+ .provably-mount .cv-eyebrow{font-size:11px}
+ .provably-mount .cv-actions{gap:10px}
+ .provably-mount .cv-actions a{max-width:100%;font-size:15px}
+ .provably-mount .cv-floats{padding-inline:8px}
+ .club-product-bottom button{width:38px;min-height:38px}
+}
+@media(max-width:360px){
+ .wrap,.foot{padding-inline:12px}
+ .tile,.service-bento>.tile,.service-bento>.tile:nth-child(-n+2),.service-bento.is-filtered>.tile,.contact,.promo,.calc,.calc-result,.ref-chart-board,.finder-panel,.finder-results{padding:16px}
+ .provably-mount .cv-headline{--cv-hs:29px}
+ .provably-mount .cv-cert-wrap{font-size:14px}
+ .provably-mount .cv-subtext{font-size:16px}
+ .provably-mount .cv-page-checks li{font-size:13px}
+ html.js .top nav.liquid-glass-nav .lgt-item .lgt-label{font-size:9.5px}
+ .metrics>div{padding:13px}
+ .metrics b{font-size:22px}
+}
