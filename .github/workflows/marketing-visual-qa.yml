@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  statuses: write
 concurrency:
   group: marketing-visual-qa
   cancel-in-progress: true
@@ -19,6 +20,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 22
     steps:
+      - name: Link QA run to commit
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({...context.repo,sha:context.sha,state:'pending',context:'marketing-visual-qa',target_url:process.env.GITHUB_SERVER_URL+'/'+process.env.GITHUB_REPOSITORY+'/actions/runs/'+context.runId,description:'Browser QA in progress'});
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
@@ -44,3 +50,12 @@ jobs:
           path: test-results/marketing-visual/
           if-no-files-found: warn
           retention-days: 7
+      - name: Report QA outcome
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          QA_RESULT: ${{ job.status }}
+        with:
+          script: |
+            const state=process.env.QA_RESULT==='success'?'success':process.env.QA_RESULT==='cancelled'?'error':'failure';
+            await github.rest.repos.createCommitStatus({...context.repo,sha:context.sha,state,context:'marketing-visual-qa',target_url:process.env.GITHUB_SERVER_URL+'/'+process.env.GITHUB_REPOSITORY+'/actions/runs/'+context.runId,description:'Browser QA '+process.env.QA_RESULT});
