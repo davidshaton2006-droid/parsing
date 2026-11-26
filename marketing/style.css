@@ -131,3 +131,16 @@ body{background:#faf9f6;color:var(--ink)}header{background:#fffefaF5;border-colo
 @media(hover:hover) and (pointer:fine){.tile:hover .service-scene-v6.motion-aligned .scene-window-v6{transform:perspective(850px) translateY(-3px)}.tile:hover .service-scene-v6 .scene-nodes-v6 b{animation:none}}
 @media(max-width:540px){.service-scene-v6{min-height:190px}.service-scene-v6 .scene-window-v6{width:87%;max-width:310px}.motion-assembly,.motion-hybrid,.motion-custom{padding:8px}.service-scene-v6 .scene-label-v6{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.service-scene-v6 .scene-window-v6,.tile:hover .service-scene-v6 .scene-window-v6{transform:none!important;transition:none!important}.service-scene-v6 .scene-halo-v6{transition:none!important}}
+
+/* Peak Chart by Louis Studios, responsive integration into the existing light site. */
+.peak-chart-host{min-width:0}
+.peak-chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:center;padding:20px 10px;border:1px solid #172745;border-radius:18px;background:radial-gradient(ellipse at 75% 68%,#14254b 0%,#0c1427 48%,#080f1a 100%);overflow:hidden}
+.peak-chart-cell,.peak-workspace-cell{min-width:0;display:flex;justify-content:center;align-items:center;isolation:isolate}
+.peak-chart-cell>div,.peak-workspace-cell>div{max-width:100%;flex:none}
+.peak-enhanced>.ref-dual-chart{display:none}
+.peak-workspace-host{min-width:0;border:1px solid #23304d;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 65%,#14264f,#080f1a 65%);padding:10px}
+.peak-chart-host:empty,.peak-workspace-host:empty{display:none}
+.peak-chart-host [data-peak-chart] button,.peak-workspace-host [data-peak-chart] button{min-height:0;box-shadow:none}
+.peak-chart-host [data-peak-chart] button:focus-visible,.peak-workspace-host [data-peak-chart] button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:680px){.peak-chart-grid{grid-template-columns:1fr;padding:12px 7px;gap:8px}.peak-workspace-host{padding:5px}.peak-chart-cell,.peak-workspace-cell{min-width:0}}
+@media(prefers-reduced-motion:reduce){.peak-chart-host *, .peak-workspace-host *{transition:none!important}}
