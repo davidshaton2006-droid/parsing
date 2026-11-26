@@ -24,7 +24,7 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 32
+    timeout-minutes: 42
     steps:
       - name: Checkout all client sites
         uses: actions/checkout@v4
@@ -148,6 +148,44 @@ jobs:
           test -s "$RUNNER_TEMP/pages/chizh-avto/index.html"
           test -s "$RUNNER_TEMP/pages/index.html"
           test -f "$RUNNER_TEMP/pages/.nojekyll"
+
+      - name: Restore original marketing 3D artwork
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/marketing-render-cache
+          key: marketing-3d-960-v1-${{ hashFiles('.github/scripts/marketing-render-3d.py') }}
+
+      - name: Generate and package original marketing 3D scenes
+        continue-on-error: true
+        timeout-minutes: 9
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+        run: |
+          set -e
+          cache="$RUNNER_TEMP/marketing-render-cache"
+          mkdir -p "$cache"
+          if [ ! -s "$cache/architecture.webp" ] || [ ! -s "$cache/journey.webp" ] || [ ! -s "$cache/partnership.webp" ] || [ ! -s "$cache/portfolio.webp" ]; then
+            python3 -m venv "$RUNNER_TEMP/marketing-render-env"
+            "$RUNNER_TEMP/marketing-render-env/bin/pip" -q install numpy pillow
+            for scene in architecture journey partnership portfolio; do
+              if [ ! -s "$cache/$scene.webp" ]; then
+                "$RUNNER_TEMP/marketing-render-env/bin/python" .github/scripts/marketing-render-3d.py "$cache" --width 960 --scene "$scene"
+              fi
+            done
+          fi
+          python3 - "$cache" "$RUNNER_TEMP/pages/marketing/assets/reference" <<'PY'
+          from pathlib import Path
+          import json, shutil, sys
+          source, dest = map(Path, sys.argv[1:])
+          manifest = dest / 'manifest.json'
+          data = json.loads(manifest.read_text())
+          for key in ('architecture','journey','partnership','portfolio'):
+              art = source / (key + '.webp')
+              if art.is_file() and art.stat().st_size > 1000:
+                  shutil.copyfile(art, dest / art.name)
+                  data[key] = '/parsing/marketing/assets/reference/' + art.name
+          manifest.write_text(json.dumps(data, indent=2))
+          PY
 
       - name: Capture actual desktop and mobile portfolio previews
         continue-on-error: true
