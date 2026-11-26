@@ -131,6 +131,25 @@ with TemporaryDirectory() as temp:
                     finally:
                         report.append(row)
                         page.close()
+            # Motion is exercised with animations enabled on desktop and mobile.
+            for width in (390, 1440):
+                page = browser.new_page(viewport={"width": width, "height": 900}, reduced_motion="no-preference")
+                try:
+                    page.goto(base, wait_until="load", timeout=20000)
+                    page.wait_for_function("document.documentElement.dataset.marketingMotion === 'motion'", timeout=10000)
+                    for scene in page.locator(".service-scene-v6").all():
+                        scene.scroll_into_view_if_needed()
+                        scene.locator(".scene-window-v6").wait_for(state="visible")
+                        page.wait_for_function("(el)=>el.dataset.motionPlayed === 'true'", arg=scene.element_handle(), timeout=7000)
+                        assert_page(scene.locator("img.reference-object-art").count()==0, "static art hides animated interface")
+                    assert_page(page.locator(".motion-approach").count()==3, "distinct approach scenes")
+                    page.locator(".motion-approach").first.screenshot(path=str(OUT / f"motion-approach-{width}.png"), animations="disabled")
+                    report.append({"page":"motion","width":width,"status":"passed"})
+                except Exception as e:
+                    failures.append(f"motion/{width}: {e}")
+                    report.append({"page":"motion","width":width,"status":"failed","error":str(e)})
+                finally:
+                    page.close()
             browser.close()
     finally:
         server.shutdown()
