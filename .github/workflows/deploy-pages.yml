@@ -152,6 +152,9 @@ jobs:
       - name: Package Motion JavaScript library
         run: bash .github/scripts/marketing-motion-vendor.sh "$RUNNER_TEMP/pages/marketing"
 
+      - name: Build Peak Chart frontend bundle
+        run: bash .github/scripts/marketing-peak-chart-build.sh "$RUNNER_TEMP/pages/marketing"
+
       - name: Restore original marketing 3D artwork
         uses: actions/cache@v4
         with:
