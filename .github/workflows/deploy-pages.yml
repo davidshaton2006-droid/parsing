@@ -149,6 +149,11 @@ jobs:
           test -s "$RUNNER_TEMP/pages/index.html"
           test -f "$RUNNER_TEMP/pages/.nojekyll"
 
+      - name: Capture actual desktop and mobile portfolio previews
+        continue-on-error: true
+        timeout-minutes: 6
+        run: node .github/scripts/marketing-project-previews.mjs "$RUNNER_TEMP/pages"
+
       - name: Upload GitHub Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
