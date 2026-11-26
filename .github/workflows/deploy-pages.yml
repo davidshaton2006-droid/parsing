@@ -149,6 +149,11 @@ jobs:
           test -s "$RUNNER_TEMP/pages/index.html"
           test -f "$RUNNER_TEMP/pages/.nojekyll"
 
+      - name: Prepare optional reference artwork for marketing
+        continue-on-error: true
+        timeout-minutes: 1
+        run: python3 .github/scripts/marketing-reference-art.py "$RUNNER_TEMP/pages"
+
       - name: Capture actual desktop and mobile portfolio previews
         continue-on-error: true
         timeout-minutes: 6
