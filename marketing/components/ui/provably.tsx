@@ -42,6 +42,7 @@ export interface ProvablyLink {
   label: string
   /** Link target. */
   href: string
+  topic?: string
 }
 
 export interface ProvablyCredential {
@@ -68,6 +69,7 @@ export interface ProvablyCopy {
   lastWord: string
   /** Paragraph under the headline. */
   subtext: string
+  checks?: string[]
 }
 
 export interface ProvablyLinks {
@@ -2410,7 +2412,7 @@ const WaveOverlay = () => {
 }
 
 /* ---- stats-card ---- */
-const format = (value: number) => Math.round(value).toLocaleString('en-US')
+const format = (value: number) => Math.round(value).toLocaleString('ru-RU')
 
 const StatsCard = () => {
   const { ENTRANCE, FLOAT, STATS, REDUCE } = useConfig()
@@ -2705,7 +2707,7 @@ const StackCard = ({
       aria-hidden={!isTop}
       aria-haspopup='dialog'
       aria-keyshortcuts='ArrowLeft ArrowRight'
-      aria-label={`${credential.title}, ${CERTIFICATE.sampleLabel.toLowerCase()}: ${CERTIFICATE.hover.toLowerCase()}. Drag or use the arrow keys for other certificates`}
+      aria-label={`${credential.title}, ${CERTIFICATE.sampleLabel.toLowerCase()}: ${CERTIFICATE.hover.toLowerCase()}. Перетащите или используйте стрелки для смены карточки`}
       onClick={onOpen}
       onKeyDown={onKey}
       onHoverStart={() => isTop && onHover(true)}
@@ -3062,10 +3064,10 @@ const CredentialDialog = () => {
 
   // Copies a link to this sample (this page plus the certificate's name), then confirms in place for a moment
   const handleShare = async () => {
-    const slug = credential.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    // Share the real page rather than a non-existent credential URL.
 
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#credential-${slug}`)
+      await navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}`)
     } catch {
       return
     }
@@ -3397,7 +3399,7 @@ const StatusBadge = () => {
             ref={frontRef}
             type='button'
             inert={flipped}
-            aria-label={`Inspect seal: ${status.toLowerCase()}`}
+            aria-label={`Открыть печать: ${status.toLowerCase()}`}
             aria-expanded={flipped}
             onClick={handleFlip}
             onPointerEnter={event => event.pointerType === 'mouse' && setHovered(true)}
@@ -3696,6 +3698,7 @@ const HeroCopy = () => {
             <KineticText text={COPY.lines[1]} />
             <motion.a
               href={LINKS.explore.href}
+              data-topic={LINKS.explore.topic}
               aria-label={LINKS.explore.label}
               className='cv-arrow cv-sweep cv-solid cv-enter'
               initial={{ opacity: 0, transform: 'scale(0.6)' }}
@@ -3710,15 +3713,17 @@ const HeroCopy = () => {
           {/* Read as a whole word; the switch and the visible "fficial." follow it */}
           
           <VerifyToggle />
-          <span aria-hidden>{COPY.lastWord}</span>
+          <span>{COPY.lastWord}</span>
         </motion.span>
       </h1>
       <motion.p className='cv-enter cv-subtext text-cv-body max-w-[25.2em] text-pretty' {...fadeUp(ENTRANCE.copy)}>
         {COPY.subtext}
       </motion.p>
+      {COPY.checks?.length ? <ul className='cv-page-checks'>{COPY.checks.map(check => <li key={check}><CheckIcon aria-hidden size={14}/>{check}</li>)}</ul> : null}
       <div className='cv-actions flex flex-col items-center gap-3 sm:flex-row sm:gap-5'>
         <motion.a
           href={LINKS.explore.href}
+              data-topic={LINKS.explore.topic}
           className='cv-sweep cv-solid cv-enter h-14 gap-2.5 pr-6 pl-7 text-[15.5px] font-semibold sm:h-[58px] sm:pr-[26px] sm:pl-[30px]'
           {...fadeUp(ENTRANCE.copy + 0.1)}
         >
