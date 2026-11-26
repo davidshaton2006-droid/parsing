@@ -84,6 +84,10 @@ const SERIES: Record<string, { data: number[]; labels: string[] }> = {
 }
 
 export interface PeakChartProps {
+  /** Optional shared numerical domain for comparisons. */
+  domain?: [number, number]
+  /** Position the resting indicator at the final observation instead of the peak. */
+  anchorEnd?: boolean
   /** Series drawn as the line, oldest first. Leave it out to use the built-in demo series for each period. Changing it morphs the line. */
   data?: number[]
   /** Optional point labels for the hover readout, one per data point (for example dates). */
@@ -346,7 +350,7 @@ type Curve = { ys: Float32Array; peakX: number; lo: number; hi: number; n: numbe
 
 /** Monotone cubic (Steffen) through evenly spaced points, sampled once per card unit. It never
     overshoots, so the highest data point is the top of the curve and the dot sits on it. */
-function buildCurve(data: number[]): Curve {
+function buildCurve(data: number[], domain?: [number, number], anchorEnd = false): Curve {
   const vals = data.length >= 2 ? data : data.length === 1 ? [data[0], data[0]] : [0, 0]
   const n = vals.length
   let lo = Infinity, hi = -Infinity, pk = 0
@@ -354,6 +358,8 @@ function buildCurve(data: number[]): Curve {
     if (vals[i] < lo) lo = vals[i]
     if (vals[i] > hi) { hi = vals[i]; pk = i }
   }
+  if (domain && Number.isFinite(domain[0]) && Number.isFinite(domain[1]) && domain[1] > domain[0]) { lo = Math.min(lo, domain[0]); hi = Math.max(hi, domain[1]) }
+  if (anchorEnd) pk = n - 1
   const span = hi - lo || 1
   const yv = vals.map((v) => (hi === lo ? (PLOT_TOP + PLOT_BOTTOM) / 2 : PLOT_TOP + (1 - (v - lo) / span) * (PLOT_BOTTOM - PLOT_TOP)))
   const h = (PLOT_X1 - PLOT_X0) / (n - 1)
@@ -441,6 +447,8 @@ function frameAt(t: number, loop: number): Frame {
 
 export function PeakChart({
   data,
+  domain,
+  anchorEnd = false,
   labels,
   value = 400,
   valueSuffix = "%",
@@ -484,7 +492,7 @@ export function PeakChart({
   const menuRef = React.useRef<HTMLDivElement>(null)
 
   const live = React.useRef({
-    curve: buildCurve(series),
+    curve: buildCurve(series, domain, anchorEnd),
     from: null as Curve | null,
     morph: 1,
     labels: pointLabels,
@@ -508,12 +516,12 @@ export function PeakChart({
   live.current.loop = loop
 
   // data changes morph the line
-  const key = series.join(",")
+  const key = series.join(",") + "|" + (domain?.join(",") ?? "") + "|" + anchorEnd
   const firstData = React.useRef(true)
   React.useEffect(() => {
     if (firstData.current) { firstData.current = false; return }
     const L = live.current
-    const next = buildCurve(series)
+    const next = buildCurve(series, domain, anchorEnd)
     const t = easeInOut(L.morph)
     if (L.from && L.morph < 1) {
       const ys = new Float32Array(CW + 1)
@@ -618,7 +626,7 @@ export function PeakChart({
       const shown = target * F.num
       L.shownValue = shown
       if (digitsRef.current) {
-        const txt = shown.toLocaleString("en-US", { minimumFractionDigits: L.decimals, maximumFractionDigits: L.decimals })
+        const txt = shown.toLocaleString("ru-RU", { minimumFractionDigits: L.decimals, maximumFractionDigits: L.decimals })
         if (digitsRef.current.textContent !== txt) digitsRef.current.textContent = txt
       }
       if (numRef.current) {
@@ -868,7 +876,7 @@ export function PeakChart({
       <div
         ref={menuRef}
         role="listbox"
-        aria-label="Period"
+        aria-label="Сценарий"
         style={{
           position: "absolute", right: px(46), top: px(80), minWidth: px(150), padding: px(6), borderRadius: px(16), zIndex: 3,
           background: "rgba(20,34,64,0.55)", border: "1px solid rgba(255,255,255,0.12)",
