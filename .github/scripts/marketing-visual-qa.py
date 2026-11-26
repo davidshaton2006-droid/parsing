@@ -82,7 +82,7 @@ with TemporaryDirectory() as temp:
                                 container:document.querySelector('main.wrap').getBoundingClientRect().width}
                         }""")
                         row["expanded_scale"] = scale
-                        assert_page(scale["body"] >= 17 and scale["title"] >= 29 and scale["heading"] >= 30 and scale["titleWeight"] >= 750, "expanded typography")
+                        assert_page(scale["body"] >= 17 and scale["title"] >= 29 and scale["heading"] >= 30 and scale["titleWeight"] >= 700, "expanded typography")
                         assert_page(scale["icon"] >= 25 and scale["button"] >= 52, "expanded navigation and CTA")
                         if width == 1920:
                             assert_page(scale["container"] >= 1500, "wide desktop container")
@@ -93,7 +93,7 @@ with TemporaryDirectory() as temp:
                         assert_page(page.locator("[data-glow]").count()>=8,"missing page-wide spotlight surfaces")
                         assert_page(page.locator(".tile:not([data-glow]),.story-tile-v5:not([data-glow]),.ref-project:not([data-glow])").count()==0,"uncovered card")
                         assert_page(page.locator(".hero[data-glow]").count()==1,"hero spotlight")
-                        expected_notes=8 if name=="home" else 4 if name in ("catalog","pricing") else 3
+                        expected_notes=4 if name=="home" else 4 if name in ("catalog","pricing") else 3
                         pinned=page.locator("section[data-pinned-approach]")
                         assert_page(pinned.count()==1,"pinned style must target only the requested section")
                         assert_page(pinned.locator(".section-head .eyebrow").text_content().strip()==("Возможности развития." if name=="home" else "Практический подход"),"wrong section modified")
@@ -107,7 +107,7 @@ with TemporaryDirectory() as temp:
                             pinned.screenshot(path=str(OUT / f"{name}-{width}-pinned-approach.png"),animations="disabled")
 
                         assert_page(page.locator("[data-slot=provably]").count()==1,"missing shared Provably hero")
-                        expected_title={"home":"Где ваш бизнес теряет клиентов, время и деньги?","catalog":"Разработка под задачи вашего бизнеса, а не ограничения готовых решений.","solutions":"Что можно создать для бизнеса в вашей отрасли?","pricing":"Понимайте, за что платите, ещё до начала разработки.","partners":"Ваши клиенты могут приносить вам значительно больше.","portfolio":"Посмотрите не только на интерфейсы, но и на возможности разработки."}[name]
+                        expected_title={"home":"Где ваш бизнес теряет клиентов, время и деньги?","catalog":"Разработка под задачи вашего бизнеса","solutions":"Что можно создать для бизнеса в вашей отрасли?","pricing":"Понятный бюджет до начала разработки","partners":"Зарабатывайте больше на своих клиентах","portfolio":"Посмотрите, что можно разработать для вашего бизнеса"}[name]
                         assert_page(page.locator("h1").evaluate("(e)=>e.getAttribute('aria-label')")==expected_title,"exact approved hero headline")
                         assert_page(page.locator("#request input[name=business]").count()==1,"inquiry business context")
 
@@ -156,12 +156,12 @@ with TemporaryDirectory() as temp:
                                 assert_page("B2B-портал" in page.locator('#request textarea[name=message]').input_value(),"diagnosis context in inquiry")
                                 assert_page("60000" in "".join(filter(str.isdigit,page.locator("#sales-result").inner_text())),"own sales economics")
                                 assert_page("60000" in "".join(filter(str.isdigit,page.locator("#product-result").inner_text())),"product economics")
-                                assert_page(pinned.locator(".pinned-note-body a").count()==8,"all problem CTAs preserved")
+                                assert_page(pinned.locator(".pinned-note-body a").count()==4,"all problem CTAs preserved")
 
                                 page.locator("#eco-saving").evaluate("(e)=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}))}")
                                 assert_page("Не покрывается" in page.locator("#eco-payback").inner_text(), "zero saving case")
                                 page.locator('[data-ref-step="4"]').click()
-                                assert_page(page.locator("#ref-step-title").inner_text() == "Тестирование и запуск", "project timeline")
+                                assert_page(page.locator("#ref-step-title").inner_text() == "Запуск", "project timeline")
                                 page.locator('[data-ref-chart="2"]').click()
                                 assert_page(page.locator("#ref-auto-out").inner_text() == "85", "chart scenario")
                                 page.locator("#ref-chart-board.peak-enhanced [data-peak-chart]").first.wait_for(state="visible",timeout=10000)

@@ -1,7 +1,7 @@
 name: Marketing visual QA
 on:
   push:
-    branches: [main, marketing-provably-hero, marketing-pinned-approach, marketing-content-revision]
+    branches: [main, marketing-provably-hero, marketing-pinned-approach, marketing-content-revision, marketing-compact-copy]
     paths:
       - 'marketing/**'
       - '.github/scripts/marketing-visual-qa.py'
@@ -43,7 +43,7 @@ jobs:
         run: bash .github/scripts/marketing-peak-chart-build.sh marketing
       - name: Build Provably hero frontend bundle
         run: bash .github/scripts/marketing-provably-build.sh marketing
-      - name: Capture and check 36 page and viewport combinations
+      - name: Capture and check 48 page and viewport combinations
         run: python .github/scripts/marketing-visual-qa.py
       - name: Publish screenshots and report
         if: always()
