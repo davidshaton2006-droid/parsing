@@ -5,6 +5,7 @@ on:
     paths:
       - 'marketing/**'
       - '.github/scripts/marketing-visual-qa.py'
+      - '.github/scripts/marketing-render-3d.py'
       - '.github/workflows/marketing-visual-qa.yml'
   workflow_dispatch:
 permissions:
@@ -15,7 +16,7 @@ concurrency:
 jobs:
   chromium:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 16
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,6 +26,22 @@ jobs:
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
+      - name: Render local 3D preview assets for browser QA
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+        run: |
+          python -m pip install numpy pillow
+          python .github/scripts/marketing-render-3d.py marketing/assets/reference --width 360
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('marketing/assets/reference/manifest.json')
+          data=json.loads(p.read_text())
+          for key in ('architecture','journey','partnership','portfolio'):
+              assert (p.parent/(key+'.webp')).is_file()
+              data[key]='/parsing/marketing/assets/reference/'+key+'.webp'
+          p.write_text(json.dumps(data,indent=2))
+          PY
       - name: Capture and check 36 page and viewport combinations
         run: python .github/scripts/marketing-visual-qa.py
       - name: Publish screenshots and report
