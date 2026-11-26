@@ -437,3 +437,13 @@ html.js .top nav.liquid-glass-nav .lgt-item:focus-visible{outline:2px solid #86a
  .section .tile .table-wrap,.section .faq .table-wrap{display:block}
  #business-diagnosis .calc{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Narrow-screen accommodation for expanded promo and finder copy. */
+@media(max-width:480px){
+ .promo{grid-template-columns:minmax(0,1fr)}
+ .promo>div,.promo .btn,.finder-demo>div,.finder-top>div,.finder-row>span{min-width:0;max-width:100%;overflow-wrap:anywhere;white-space:normal}
+ .promo .btn{width:fit-content}
+ .finder-demo{grid-template-columns:minmax(0,1fr)}
+ .finder-top,.finder-row{flex-wrap:wrap;gap:8px}
+ .finder-top .status-dot,.finder-row .finder-status{white-space:normal;max-width:100%;overflow-wrap:anywhere}
+}
