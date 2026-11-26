@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   inventory:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
       - name: Expose audit run link and inventory failed jobs
@@ -29,11 +29,8 @@ jobs:
             const status=state=>github.rest.repos.createCommitStatus({...repo,sha:context.sha,state,context:'actions-failure-inventory',target_url:url,description:state==='pending'?'Reading recent Actions runs':'Inventory complete; deployment not certified'});
             await status('pending');
             try {
-              const runs=await github.paginate(github.rest.actions.listWorkflowRunsForRepo,{...repo,per_page:100},(response,done)=>{
-                if(response.data.workflow_runs.length<100)done();
-                return response.data.workflow_runs;
-              });
-              const latest=runs.slice(0,100);
+              const response=await github.rest.actions.listWorkflowRunsForRepo({...repo,per_page:100});
+              const latest=(response.data.workflow_runs ?? response.data).slice(0,100);
               const inventory=[];
               for(const run of latest){
                 const item={id:run.id,name:run.name,sha:run.head_sha,event:run.event,status:run.status,conclusion:run.conclusion,url:run.html_url,jobs:[]};
