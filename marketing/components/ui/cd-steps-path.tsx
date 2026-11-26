@@ -162,7 +162,7 @@ export function StepsPath({ steps, title = "Этапы проекта", defaultS
           </motion.div>
         </div>
 
-        <div onPointerDown={begin("card")} onPointerMove={move} onPointerUp={end} onPointerCancel={end} className="relative mt-2 h-[16rem] sm:h-[14rem] touch-pan-y cursor-grab select-none active:cursor-grabbing" style={{ perspective: 1000 }}>
+        <div onPointerDown={begin("card")} onPointerMove={move} onPointerUp={end} onPointerCancel={end} className="relative mt-2 h-[18rem] sm:h-[15rem] touch-pan-y cursor-grab select-none active:cursor-grabbing" style={{ perspective: 1000 }}>
           <ul className="relative h-full">{steps.map((s, i) => <StepCard key={s.id} s={s} i={i} pos={pos} w={cw} reduce={reduce} active={i === step} total={n} />)}</ul>
         </div>
 
