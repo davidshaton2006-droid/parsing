@@ -62,3 +62,18 @@ body{background:#faf9f6;color:var(--ink)}header{background:#fffefaF5;border-colo
 @media(hover:hover) and (pointer:fine){.has-object-art:hover>.reference-object-art{transform:none;translate:var(--art-x,0px) var(--art-y,0px);scale:1.035}}
 @media(max-width:540px){.service-scene-v6.has-object-art{min-height:0;height:auto;aspect-ratio:4/3}.visual-stage-v5.has-object-art{aspect-ratio:4/3}.hero-chips-v5{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.has-object-art>.reference-object-art,.has-object-art:hover>.reference-object-art{animation:none;transition:none!important;translate:none;scale:1;transform:none}}
+
+/* Studio composition: 3D renders stay within their natural aspect ratio. */
+.visual-stage-v5[data-ref-art]{position:relative;min-width:0;min-height:0}
+.visual-stage-v5[data-ref-art].has-object-art{aspect-ratio:4/3;isolation:isolate;background:#ebe7de;border:1px solid #e6dfd4;border-radius:18px;overflow:hidden}
+.visual-stage-v5[data-ref-art].has-object-art>.reference-object-art{object-fit:contain;object-position:50% 50%;max-width:100%;width:100%;height:100%;transform:none}
+.visual-stage-v5[data-ref-art].has-object-art>.hero-chips-v5{margin-top:auto;position:relative;padding:23px 10px 9px;background:linear-gradient(transparent,#f3efe8e8);justify-content:center;z-index:2;flex-wrap:wrap}
+.visual-stage-v5[data-ref-art].has-object-art .hero-chips-v5 span{box-shadow:0 2px 8px #2b28530a;border:1px solid #fff;background:#fffdf7ed;font-size:11px;color:#34406c}
+.visual-stage-v5[data-ref-art]:not(.has-object-art) .reference-object-art{opacity:0}
+.service-scene-v6.has-object-art{background:#f2ece3}
+.service-scene-v6.has-object-art .reference-object-art{max-width:100%;object-fit:contain}
+.hero-visual .visual-stage-v5[data-ref-art]{max-width:650px;margin-inline:auto}
+.story-tile-v5 .story-mini-v5{opacity:.92}
+.tile .textlink,.ref-project .textlink{transition:color .2s,background-color .2s}
+@media(max-width:540px){.visual-stage-v5[data-ref-art].has-object-art{border-radius:13px}.visual-stage-v5[data-ref-art].has-object-art>.hero-chips-v5{padding:14px 6px 6px;gap:4px}.visual-stage-v5[data-ref-art].has-object-art .hero-chips-v5 span{font-size:9px;padding:4px 6px}}
+@media(prefers-reduced-motion:reduce){.visual-stage-v5[data-ref-art].has-object-art>.reference-object-art{animation:none!important;transform:none!important;translate:none!important;scale:1!important}.tile .textlink,.ref-project .textlink{transition:none}}
