@@ -73,6 +73,12 @@ with TemporaryDirectory() as temp:
                         assert_page(result["h1"] == 1 and result["nav"] == 6 and result["tabs"] == 7 and result["active"] == 1, "incorrect headings/navigation")
                         bar = page.locator("#nav .lgt-track")
                         assert_page(bar.is_visible(), "liquid glass navigation not visible")
+                        assert_page(page.locator("html").get_attribute("data-spotlight")=="ready","Spotlight controller not ready")
+                        assert_page(page.locator("[data-glow]").count()>=8,"missing page-wide spotlight surfaces")
+                        assert_page(page.locator(".tile:not([data-glow]),.story-tile-v5:not([data-glow]),.ref-project:not([data-glow])").count()==0,"uncovered card")
+                        assert_page(page.locator(".hero[data-glow]").count()==1,"hero spotlight")
+                        assert_page(page.locator(".hero").evaluate("(e)=>getComputedStyle(e,'::after').opacity")== "0","reduced motion must suppress spotlight")
+
                         assert_page(bar.locator("a[aria-current=page]").evaluate("(e)=>e.classList.contains('lgt-on')"), "current route not selected")
                         assert_page(bar.locator(".lgt-item svg").count()==7, "missing navigation icons")
                         assert_page(bar.evaluate("""e=>[...e.querySelectorAll('.lgt-item')].every(i=>{
@@ -174,6 +180,24 @@ with TemporaryDirectory() as temp:
                         assert_page(scene.locator("img.reference-object-art").count()==0, "static art hides animated interface")
                     assert_page(page.locator(".motion-approach").count()==3, "distinct approach scenes")
                     page.locator(".motion-approach").first.screenshot(path=str(OUT / f"motion-approach-{width}.png"), animations="disabled")
+                    # Test pointer light and the independently rendered border without intercepting input.
+                    if width==1440:
+                        card=page.locator(".service-bento > .tile").first
+                        card.scroll_into_view_if_needed()
+                        box=card.bounding_box()
+                        assert_page(box is not None,"spotlight card has no layout")
+                        x0=box["x"]+min(40,box["width"]/4)
+                        y0=max(100,box["y"]+min(40,box["height"]/4))
+                        page.mouse.move(x0,y0)
+                        page.wait_for_function("(el)=>el.classList.contains('spotlight-active')",arg=card.element_handle(),timeout=2500)
+                        page.wait_for_function("(el)=>getComputedStyle(el,'::after').opacity==='1'",arg=card.element_handle(),timeout=2500)
+                        first=card.evaluate("(e)=>parseFloat(e.style.getPropertyValue('--spot-x'))")
+                        page.mouse.move(x0+60,y0)
+                        page.wait_for_function("({el,first})=>Math.abs(parseFloat(el.style.getPropertyValue('--spot-x'))-first)>25",arg={"el":card.element_handle(),"first":first},timeout=2500)
+                        assert_page(card.evaluate("(e)=>getComputedStyle(e,'::after').pointerEvents")=="none","spotlight blocks controls")
+                        assert_page(card.evaluate("(e)=>getComputedStyle(e,'::after').maskComposite")=="exclude","border mask is missing")
+                        page.locator(".service-bento").screenshot(path=str(OUT/"spotlight-desktop.png"),animations="disabled")
+                        page.mouse.move(1,1)
                     # Test the actual spring, including interruption, and navigation to another page.
                     page.evaluate("window.scrollTo({top:0,behavior:'instant'})")
                     bar=page.locator("#nav .lgt-track")
