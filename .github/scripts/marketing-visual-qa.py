@@ -37,6 +37,19 @@ with TemporaryDirectory() as temp:
                         resp = page.goto(base + route, wait_until="load", timeout=20000)
                         assert_page(resp and resp.ok, "page response failed")
                         page.evaluate("document.fonts.ready")
+                        # Verify the actual artwork declared in the local manifest.
+                        # Lazy images are explicitly scrolled into view before checking.
+                        art_manifest = json.loads((ROOT / "marketing/assets/reference/manifest.json").read_text())
+                        for art in page.locator("[data-ref-art]").all():
+                            key = art.get_attribute("data-ref-art")
+                            if key in art_manifest:
+                                art.scroll_into_view_if_needed()
+                                art.locator("img.reference-object-art").wait_for(state="attached", timeout=7000)
+                                page.wait_for_function("(key)=>{const e=document.querySelector('[data-ref-art='+key+']');const i=e?.querySelector('img');return e?.classList.contains('has-object-art')&&i?.naturalWidth>0}", arg=key, timeout=7000)
+                                if width in (390, 1440):
+                                    art.screenshot(path=str(OUT / f"{name}-{width}-art-{key}.png"), animations="disabled")
+                        page.evaluate("window.scrollTo(0,0)")
+
                         page.screenshot(path=str(OUT / f"{name}-{width}.png"), animations="disabled")
                         if width in (390, 1440):
                             page.locator(".hero").screenshot(path=str(OUT / f"{name}-{width}-hero.png"), animations="disabled")
