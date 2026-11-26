@@ -295,3 +295,64 @@ target.prepend(img);img.src=url;
   style.addEventListener('error',()=>{document.documentElement.dataset.provably='fallback'},{once:true});
   document.head.append(style);
 })();
+
+/* HowItWorks pinned cards — native port of the supplied component.
+   Exact section labels only; no global card selectors or content changes. */
+;(()=>{
+  const svgNS='http://www.w3.org/2000/svg';
+  const pinPath='M16 3a1 1 0 0 1 .117 1.993l-.117 .007v4.764l1.894 3.789a1 1 0 0 1 .1 .331l.006 .116v2a1 1 0 0 1 -.883 .993l-.117 .007h-4v4a1 1 0 0 1 -1.993 .117l-.007 -.117v-4h-4a1 1 0 0 1 -.993 -.883l-.007 -.117v-2a1 1 0 0 1 .06 -.34l.046 -.107l1.894 -3.791v-4.762a1 1 0 0 1 -.117 -1.993l.117 -.007h8z';
+  const labels=new Set(['С чем ко мне приходят','Практический подход']);
+  for(const section of document.querySelectorAll('section.section')){
+    const label=section.querySelector(':scope > .section-head > .eyebrow')?.textContent.trim();
+    if(!labels.has(label))continue;
+    const grid=section.querySelector(':scope > .rows, :scope > .story-grid-v5, :scope > .journey-v5 > .journey-steps-v5');
+    if(!grid)continue;
+    section.dataset.pinnedApproach='true';grid.classList.add('pinned-approach');
+    const svg=document.createElementNS(svgNS,'svg');svg.classList.add('pinned-connector');svg.setAttribute('aria-hidden','true');svg.setAttribute('preserveAspectRatio','none');
+    const path=document.createElementNS(svgNS,'path');path.setAttribute('fill','none');path.setAttribute('stroke-width','2');path.setAttribute('stroke-dasharray','8 6');path.setAttribute('stroke-linecap','round');path.setAttribute('vector-effect','non-scaling-stroke');svg.append(path);
+    let raf=0;
+    const draw=()=>{
+      raf=0;
+      const cards=[...grid.querySelectorAll(':scope > article.pinned-note')];
+      const box=grid.getBoundingClientRect();
+      if(!box.width||!box.height||cards.length<2){path.setAttribute('d','');return}
+      svg.setAttribute('viewBox','0 0 '+box.width+' '+box.height);
+      const pts=cards.map(card=>{const r=card.getBoundingClientRect();return [r.left+r.width/2-box.left,r.top+r.height/2-box.top]});
+      let d='M '+pts[0].join(' ');
+      for(let i=1;i<pts.length;i++){
+        const a=pts[i-1],z=pts[i],mid=(a[0]+z[0])/2;
+        d+=' C '+mid+' '+a[1]+', '+mid+' '+z[1]+', '+z.join(' ');
+      }
+      path.setAttribute('d',d);
+    };
+    const schedule=()=>{if(!raf)raf=requestAnimationFrame(draw)};
+    const observer='ResizeObserver'in window?new ResizeObserver(schedule):null;
+    const decorate=()=>{
+      const cards=[...grid.querySelectorAll(':scope > article')];
+      cards.forEach((card,i)=>{
+        if(card.classList.contains('pinned-note'))return;
+        const h=card.querySelector('h3'),p=card.querySelector('p');
+        if(!h||!p)return;
+        const num=card.querySelector('.num,.story-number-v5,:scope > b');
+        const number=document.createElement('span');number.className='pinned-number';number.textContent=num?.textContent.trim()||String(i+1).padStart(2,'0');
+        const pin=document.createElementNS(svgNS,'svg');pin.setAttribute('viewBox','0 0 24 24');pin.setAttribute('width','32');pin.setAttribute('height','32');pin.setAttribute('fill','currentColor');pin.setAttribute('aria-hidden','true');pin.classList.add('pinned-pin');
+        const icon=document.createElementNS(svgNS,'path');icon.setAttribute('d',pinPath);pin.append(icon);
+        const body=document.createElement('div');body.className='pinned-note-body';body.append(number,h,p);
+        const frame=document.createElement('div');frame.className='pinned-note-frame';frame.append(pin,body);
+        card.replaceChildren(frame);
+        card.classList.add('pinned-note');card.dataset.pinTheme=['gold','blue','lavender'][i%3];
+        card.style.setProperty('--pin-rotation',i%2?'-8deg':'8deg');
+      });
+      if(!svg.isConnected)grid.prepend(svg);
+      observer?.disconnect();observer?.observe(grid);cards.forEach(c=>observer?.observe(c));
+      schedule();
+    };
+    decorate();
+    // Scenario buttons replace only their own three articles; decorate those again.
+    if(grid.classList.contains('journey-steps-v5')){
+      new MutationObserver(()=>{if(!svg.isConnected||grid.querySelector(':scope > article:not(.pinned-note)'))decorate()}).observe(grid,{childList:true});
+    }
+    window.addEventListener('resize',schedule,{passive:true});
+    document.fonts?.ready.then(schedule);
+  }
+})();
