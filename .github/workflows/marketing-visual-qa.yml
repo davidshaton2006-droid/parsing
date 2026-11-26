@@ -16,7 +16,7 @@ concurrency:
 jobs:
   chromium:
     runs-on: ubuntu-latest
-    timeout-minutes: 16
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
           p=Path('marketing/assets/reference/manifest.json')
           data=json.loads(p.read_text())
-          for key in ('architecture','journey','partnership','portfolio'):
+          for key in ('architecture','journey','partnership','portfolio','ai-core','automation-flow','commerce','mobile-app','integration-hub','knowledge-vault'):
               assert (p.parent/(key+'.webp')).is_file()
               data[key]='/parsing/marketing/assets/reference/'+key+'.webp'
           p.write_text(json.dumps(data,indent=2))
