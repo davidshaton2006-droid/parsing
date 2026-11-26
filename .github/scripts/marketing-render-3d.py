@@ -11,7 +11,36 @@ def ball(c,r,m): return ('ball',np.array(c,np.float32),np.array([r],np.float32),
 def platform(): return [cyl((0,.09,0),2.55,.18,GOLD),cyl((0,.24,0),2.52,.25,WHITE)]
 def scene(key):
     s=platform()
-    if key=='architecture':
+    if key=='ai-core':
+        s += [box((0,.54,0),(1.35,.18,1.05),BLUE,.13),box((0,.83,0),(1.05,.13,.82),WHITE,.1),box((0,1.18,0),(.67,.18,.61),GOLD,.12),ball((0,1.72,0),.43,GLASS)]
+        for a in [-1.06,1.06]:
+            for z in [-.70,.70]:
+                s += [box((a,.87,z),(.21,.16,.23),WHITE,.06),ball((a,1.14,z),.12,GOLD)]
+        for z in [-.7,.7]: s.append(cyl((0,.78,z),.035,1.7,GOLD,0))
+    elif key=='automation-flow':
+        for i,(a,y,z,m) in enumerate([(-1.26,.86,.34,WHITE),(0,1.20,-.34,BLUE),(1.26,.9,.34,WHITE)]):
+            s += [box((a,y,z),(.48,.46,.43),m,.14),box((a,y+.05,z+.45),(.28,.23,.035),GOLD,.06),ball((a,y+.05,z+.51),.12,WHITE if i==1 else BLUE)]
+        for a in [-.64,.64]: s += [cyl((a,.54,.34),.05,.52,GOLD,0),ball((a,.54,.34),.1,GOLD)]
+    elif key=='commerce':
+        s += [box((-.65,1.30,-.22),(1.14,.80,.11),BLUE,.12),box((-.65,1.30,-.075),(1.03,.70,.05),WHITE,.08),box((-.65,1.80,-.011),(.9,.08,.025),GOLD,.03)]
+        for a in [-1.25,-.65,-.05]:
+            s += [box((a,1.20,-.006),(.24,.31,.04),GLASS,.04),box((a,1.32,.052),(.15,.15,.08),BLUE,.05),box((a,.98,.052),(.14,.045,.025),GOLD,.02)]
+        s += [box((.97,.78,.87),(.52,.4,.41),BLUE,.07),box((.97,1.22,.87),(.56,.07,.45),GOLD,.05),box((.97,.99,1.29),(.07,.24,.025),GOLD,.02)]
+    elif key=='mobile-app':
+        s += [box((-.30,1.37,0),(.66,1.01,.13),GOLD,.19),box((-.30,1.37,.15),(.60,.95,.04),DARK,.13),box((-.30,1.37,.20),(.54,.87,.025),WHITE,.1),box((-.30,2.12,.24),(.19,.035,.02),BLUE,.02)]
+        for i in range(3): s.append(box((-.30+(.08 if i%2 else -.08),1.86-i*.3,.24),(.35,.1,.028),BLUE if i%2 else GLASS,.06))
+        s += [box((-.30,.66,.24),(.37,.1,.03),GOLD,.055),box((1.04,1.14,.58),(.56,.4,.1),BLUE,.1),box((1.04,1.14,.7),(.38,.075,.025),WHITE,.03),ball((1.46,1.5,.72),.15,GOLD)]
+    elif key=='integration-hub':
+        s += [cyl((0,.65,0),.79,.59,BLUE),cyl((0,1.02,0),.70,.13,GOLD),cyl((0,1.16,0),.55,.16,WHITE),ball((0,1.56,0),.3,BLUE)]
+        for a,z in [(-1.4,0),(1.4,0),(0,-1.4),(0,1.4)]:
+            s += [box((a,.69,z),(.38,.33,.38),WHITE,.1),box((a,1.06,z),(.23,.05,.23),BLUE,.04),ball((a,1.16,z),.085,GOLD),cyl((a/2,.39,z/2),.055,.73,GOLD,0 if a else 2)]
+    elif key=='knowledge-vault':
+        for a,m in [(-.92,WHITE),(-.45,BLUE),(.02,WHITE)]:
+            s += [box((a,1.25,-.15),(.19,.86,.66),m,.06),box((a,1.28,.53),(.13,.12,.025),GOLD,.025),box((a,.64,.53),(.13,.045,.025),GOLD,.02)]
+        s += [box((.95,1.04,.55),(.56,.64,.11),GOLD,.1),box((.95,1.04,.68),(.47,.55,.035),WHITE,.07)]
+        for i in range(3): s.append(box((.95,1.3-i*.2,.73),(.28,.055,.025),GLASS,.025))
+        s += [cyl((1.12,.7,1.02),.28,.1,BLUE,2),cyl((1.12,.7,1.09),.21,.04,GOLD,2),ball((1.12,.7,1.13),.1,WHITE)]
+    elif key=='architecture':
         for j,(y,mat) in enumerate([(0.58,WHITE),(1.02,BLUE),(1.46,GOLD),(1.90,WHITE)]):
             s.append(box((-.18,y,.05),(1.24,.14,.94),mat,.11))
             for x in [-.97,-.57,.01,.60]:
@@ -79,15 +108,32 @@ def render(key,w,h):
     for dist in [.06,.16,.32]: occ-=np.maximum(0,dist-sdf(v+n*dist,objects))*.56
     occ=np.clip(occ,.56,1)
     palette=np.array([(.90,.85,.78)]+[o[4] for o in objects],np.float32); base=palette[mi+1]; metal=np.array([False]+[o[4]==GOLD for o in objects])[mi+1]
-    illumination=(.48+.52*diff*shadow)*occ
-    rgb=base*illumination[:,None]+(ndh**45*shadow*.28)[:,None]
-    stripe=.45+.35*np.sin((n[:,0]*1.8+n[:,1]*.8+n[:,2]*2.2)*3.1)+.20*np.maximum(n[:,1],0)
-    rgb[metal]=base[metal]*(.42+.58*stripe[metal,None])*occ[metal,None]+(ndh[metal]**20*shadow[metal]*.45)[:,None]
-    floor=mi==-1; rgb[floor]=base[floor]*(.77+.20*shadow[floor,None])*occ[floor,None]
+    # Studio material approximation: marble, cobalt enamel and brushed gold.
+    eye=-f; ndv=np.maximum(n@eye,0); reflected=2*ndv[:,None]*n-eye
+    def lobe(direction,power): return np.maximum(reflected@unit(np.array(direction)),0)**power
+    soft=lobe([-3,6,4],12); strip=lobe([5,3,2],30); edge=lobe([-1,4,-5],22)
+    fill=np.maximum(n@unit(np.array([5.,3.,2.])),0); rim=np.maximum(n@unit(np.array([-1.,4.,-5.])),0)
+    mats=[None]+[o[4] for o in objects]
+    mask=lambda m:np.array([a==m for a in mats])[mi+1]
+    stone=mask(WHITE); enamel=mask(BLUE); glass=mask(GLASS)
+    x0,y0,z0=v.T
+    wave=x0*3.2+z0*2.1+y0*.8+.7*np.sin(z0*3.8+x0*.8)+.23*np.sin(x0*12-z0*8)
+    vein=.075*np.exp(-(np.sin(wave)/.047)**2)+.018*np.exp(-(np.sin(wave)/.16)**2)
+    grain=.004*np.sin(x0*151+z0*97)*np.sin(y0*137-z0*83)
+    base[stone]*=(1-vein[stone,None]+grain[stone,None])
+    ambient=.38+.40*diff*shadow+.15*fill+.09*rim
+    fresnel=.045+.17*(1-ndv)**4; spec=fresnel*(.54*soft+.48*strip+.42*edge)
+    rgb=base*ambient[:,None]*occ[:,None]+spec[:,None]*np.array([1.,.97,.91])
+    rgb[enamel]+=(.1*soft+.09*strip+.12*edge)[enamel,None]*np.array([.75,.83,1.])
+    env=.32+.34*np.maximum(reflected[:,1],0)+.43*soft+.55*strip+.38*edge
+    brushed=1+.022*np.sin(155*y0+12*x0)*np.sin(34*z0)
+    rgb[metal]=base[metal]*env[metal,None]*brushed[metal,None]*occ[metal,None]+(.10*strip[metal,None]+.08*soft[metal,None])*np.array([1.,.87,.57])
+    rgb[glass]=base[glass]*(.58+.26*(diff*shadow)[glass,None])+.14*soft[glass,None]+.14*(1-ndv[glass,None])**3
+    floor=mi==-1; rgb[floor]=base[floor]*(.78+.20*shadow[floor,None])*occ[floor,None]
     color[ids]=rgb
     vign=np.clip(1-.20*(x.ravel()**2+y.ravel()**2),.85,1); color=np.clip(color*vign[:,None],0,1)**(1/2.2)
     return Image.fromarray(np.uint8(color.reshape(h,w,3)*255+.5),'RGB')
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('output',type=Path);parser.add_argument('--width',type=int,default=960);parser.add_argument('--scene',choices=['architecture','journey','partnership','portfolio']);args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
-    for key in ([args.scene] if args.scene else ['architecture','journey','partnership','portfolio']):
+    parser=argparse.ArgumentParser();parser.add_argument('output',type=Path);parser.add_argument('--width',type=int,default=960);parser.add_argument('--scene',choices=['architecture','journey','partnership','portfolio','ai-core','automation-flow','commerce','mobile-app','integration-hub','knowledge-vault']);args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
+    for key in ([args.scene] if args.scene else ['architecture','journey','partnership','portfolio','ai-core','automation-flow','commerce','mobile-app','integration-hub','knowledge-vault']):
         im=render(key,args.width,round(args.width*.75));im.save(args.output/(key+'.webp'),quality=84,method=6);print(key,im.size,flush=True)
