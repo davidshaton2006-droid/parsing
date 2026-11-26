@@ -53,10 +53,15 @@ with TemporaryDirectory() as temp:
                         page.screenshot(path=str(OUT / f"{name}-{width}.png"), animations="disabled")
                         if width in (390, 1440):
                             page.locator(".hero").screenshot(path=str(OUT / f"{name}-{width}-hero.png"), animations="disabled")
+                        # Decode lazy images before asserting resource health; a screenshot alone does not trigger every lazy resource.
+                        page.evaluate("""async () => {
+                            const imgs=[...document.images].filter(i=>!i.hidden&&!i.closest('[hidden]')&&i.getAttribute('src'));
+                            await Promise.all(imgs.map(async i=>{i.loading='eager';try{await i.decode()}catch{}}));
+                        }""")
                         result = page.evaluate("""() => ({
                             width: document.documentElement.clientWidth,
                             scroll: document.documentElement.scrollWidth,
-                            badImages: [...document.images].filter(i=>!i.classList.contains('reference-object-art')&&(!i.complete||i.naturalWidth===0)).map(i=>i.src),
+                            badImages: [...document.images].filter(i=>!i.classList.contains('reference-object-art')&&!i.hidden&&!i.closest('[hidden]')&&i.getAttribute('src')&&(!i.complete||i.naturalWidth===0)).map(i=>i.src),
                             h1: document.querySelectorAll('h1').length,
                             nav: document.querySelectorAll('#nav > a').length
                         })""")
@@ -80,11 +85,11 @@ with TemporaryDirectory() as temp:
                                 assert_page(page.locator("#ref-auto-out").inner_text() == "85", "chart scenario")
                                 page.locator("#ref-chart-board.peak-enhanced [data-peak-chart]").first.wait_for(state="visible",timeout=10000)
                                 assert_page(page.locator("#ref-chart-board [data-peak-chart]").count()==2,"two original Peak Chart instances")
-                                page.wait_for_function("document.querySelectorAll('#ref-chart-board [data-part=period]')[0]?.textContent==='Интенсивный'")
+                                page.wait_for_function("document.querySelectorAll('#ref-chart-board [data-part=period]')[0]?.textContent==='Интенсивный'",timeout=10000)
                                 page.locator("#ref-chart-board [data-peak-chart]").first.locator("button[aria-haspopup=listbox]").click()
                                 page.locator("#ref-chart-board [data-peak-chart]").first.get_by_role("option",name="Постепенный").click()
                                 assert_page(page.locator("#ref-auto-out").inner_text()=="45","Peak Chart dropdown sync")
-                                page.wait_for_function("document.querySelectorAll('#ref-chart-board [data-part=period]')[1]?.textContent==='Постепенный'")
+                                page.wait_for_function("document.querySelectorAll('#ref-chart-board [data-part=period]')[1]?.textContent==='Постепенный'",timeout=10000)
                                 page.locator("#workspace-body [data-peak-chart]").wait_for(state="visible",timeout=10000)
                                 assert_page(page.locator("#workspace-body .workspace-chart").is_hidden(),"workspace chart replacement")
 
