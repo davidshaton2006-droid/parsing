@@ -204,3 +204,81 @@ target.prepend(img);img.src=url;
   panel.addEventListener('click',e=>{if(e.target.closest('a')){panel.hidden=true;directions.setAttribute('aria-expanded','false');}});
   window.addEventListener('pageshow',()=>{clearTimeout(redirect);panel.hidden=true;directions.setAttribute('aria-expanded','false');size();select(current)});
 })();
+
+/* Spotlight Card / GlowCard — native adaptation of the supplied React component.
+   Preserve each existing surface's layout, color and interactive descendants.
+   Original defaults: blue base 220, spread 200, 200px spotlight, 3px rim. */
+;(()=>{
+  const root=document.documentElement;
+  const selector=[
+    '.hero','.tile','.story-tile-v5','.ref-project','.rows','.rows > article',
+    '.metrics','.metrics > div','.faq','.faq > details','.promo','.contact',
+    '.experience > article','.audit-offer','.audit-board','.economy-panel','.economy-result',
+    '.workspace-demo','.workspace-content','.workspace-kpis > div','.ref-process',
+    '.ref-chart-board','.journey-v5','.journey-steps-v5 > article',
+    '.club-demo','.club-screen','.club-product','.club-cart',
+    '.calc','.calc-result','.flow','.table-wrap','.tier-simulator','.tier-result',
+    '.partner-presets > button','.finder-demo','.finder-panel','.finder-results',
+    '.showcase','.showcase-screen'
+  ].join(',');
+  const fine=matchMedia('(hover: hover) and (pointer: fine)');
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const cards=new Set(), active=new Set();
+  let point=null,frame=0;
+  const enabled=()=>fine.matches&&!reduced.matches;
+  const register=el=>{
+    if(cards.has(el))return;
+    cards.add(el);el.setAttribute('data-glow','');
+    if(getComputedStyle(el).position==='static')el.classList.add('spotlight-position');
+  };
+  const scan=node=>{
+    if(node.nodeType!==1&&node.nodeType!==9)return;
+    if(node.matches?.(selector))register(node);
+    node.querySelectorAll(selector).forEach(register);
+  };
+  scan(document);
+  root.dataset.spotlight='ready';
+  const clear=()=>{active.forEach(el=>el.classList.remove('spotlight-active'));active.clear()};
+  const render=()=>{
+    frame=0;
+    if(!point||!enabled()){clear();return}
+    const {x,y}=point, hue=220+200*Math.max(0,Math.min(1,x/Math.max(1,innerWidth)));
+    const next=new Set(), updates=[];
+    for(const el of cards){
+      if(!el.isConnected){cards.delete(el);continue}
+      if(el.hidden||el.closest('[hidden]'))continue;
+      const b=el.getBoundingClientRect();
+      if(!b.width||!b.height||b.bottom<-200||b.top>innerHeight+200)continue;
+      const dx=Math.max(b.left-x,0,x-b.right),dy=Math.max(b.top-y,0,y-b.bottom);
+      if(dx*dx+dy*dy>200*200)continue;
+      next.add(el);updates.push([el,x-b.left,y-b.top]);
+    }
+    for(const el of active)if(!next.has(el)){el.classList.remove('spotlight-active');active.delete(el)}
+    for(const [el,lx,ly] of updates){
+      el.style.setProperty('--spot-x',lx.toFixed(2)+'px');
+      el.style.setProperty('--spot-y',ly.toFixed(2)+'px');
+      el.style.setProperty('--spot-hue',hue.toFixed(2));
+      if(!active.has(el)){el.classList.add('spotlight-active');active.add(el)}
+    }
+  };
+  const schedule=()=>{if(!frame)frame=requestAnimationFrame(render)};
+  const reset=()=>{point=null;if(frame)cancelAnimationFrame(frame);frame=0;clear()};
+  document.addEventListener('pointermove',e=>{
+    if(!enabled()||e.pointerType==='touch')return;
+    point={x:e.clientX,y:e.clientY};schedule();
+  },{passive:true});
+  document.documentElement.addEventListener('pointerleave',reset);
+  window.addEventListener('blur',reset);
+  window.addEventListener('scroll',()=>{if(point)schedule()},{passive:true,capture:true});
+  window.addEventListener('resize',()=>{if(point)schedule()},{passive:true});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)reset()});
+  fine.addEventListener?.('change',reset);reduced.addEventListener?.('change',reset);
+  // Existing dashboards and filtered views may replace their content.
+  // Observe additions only; do not react to the spotlight's own style writes.
+  const observer=new MutationObserver(records=>{
+    let added=false;
+    for(const rec of records)for(const node of rec.addedNodes)if(node.nodeType===1){scan(node);added=true}
+    if(added&&point)schedule();
+  });
+  observer.observe(document.body,{childList:true,subtree:true});
+})();
