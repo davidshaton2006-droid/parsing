@@ -33,3 +33,75 @@ target.prepend(img);img.src=url;
 }).catch(()=>{});})();
 
 ;(()=>{if(!matchMedia('(hover:hover) and (pointer:fine)').matches||matchMedia('(prefers-reduced-motion: reduce)').matches)return;document.querySelectorAll('[data-ref-art]').forEach(el=>{let raf=0;el.addEventListener('pointermove',event=>{if(!el.classList.contains('has-object-art'))return;const rect=el.getBoundingClientRect();const x=Math.max(-1,Math.min(1,(event.clientX-rect.left)/rect.width*2-1)),y=Math.max(-1,Math.min(1,(event.clientY-rect.top)/rect.height*2-1));cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{el.style.setProperty('--art-x',(x*4).toFixed(2)+'px');el.style.setProperty('--art-y',(y*3).toFixed(2)+'px')})});el.addEventListener('pointerleave',()=>{cancelAnimationFrame(raf);el.style.setProperty('--art-x','0px');el.style.setProperty('--art-y','0px')})})})();
+
+/* Motion design layer: no generated imagery. Motion is optional; native WAAPI is the fallback. */
+;(()=>{
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  const cards=[...document.querySelectorAll('.service-scene-v6')];
+  const ease=[.22,1,.36,1];
+  const running=new WeakMap();
+  let engine=null;
+  const play=(el,frames,ms,delay=0)=>{
+    if(!el||reduce.matches)return;
+    const prev=running.get(el);if(prev){try{prev.cancel?.()}catch{}}
+    let a;
+    try{
+      if(engine?.animate) {
+        const props={};Object.keys(frames[0]).forEach(k=>props[k]=frames.map(f=>f[k]));
+        a=engine.animate(el,props,{duration:ms/1000,delay:delay/1000,ease});
+      }else if(el.animate){a=el.animate(frames,{duration:ms,delay,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'})}
+    }catch{try{a=el.animate(frames,{duration:ms,delay,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'})}catch{}}
+    if(a)running.set(el,a);
+  };
+  // Three approach cards become distinct working-style visual compositions.
+  const approaches={
+    components:'<div class="motion-assembly"><div class="assembly-module"><b>UI</b><span>Интерфейс</span></div><div class="assembly-module"><b>API</b><span>Подключение</span></div><div class="assembly-module"><b>✓</b><span>Настройка</span></div><div class="assembly-result"><i></i><b>Готовый модуль</b><span>Компоненты собраны</span></div></div>',
+    hybrid:'<div class="motion-hybrid"><div class="hybrid-source"><b>Готовые модули</b><i></i><i></i></div><div class="hybrid-source"><b>Своя логика</b><span>&lt;/&gt;</span></div><div class="hybrid-join"></div><div class="hybrid-output"><i>✓</i><b>Единый продукт</b></div></div>',
+    custom:'<div class="motion-custom"><div class="custom-code"><b>Бизнес-логика</b><code>if (request) {<br>&nbsp; process();<br>&nbsp; sync();<br>}</code></div><div class="custom-ui"><b>Свой интерфейс</b><i></i><div><span></span><span></span></div><span class="custom-button">Готово</span></div></div>'
+  };
+  cards.forEach(scene=>{
+    const key=Object.keys(approaches).find(k=>scene.classList.contains('scene-'+k));
+    if(key){const win=scene.querySelector('.scene-window-v6');if(win){const old=[...win.children].find(n=>!n.classList.contains('scene-top-v6'));if(old){old.outerHTML=approaches[key];scene.classList.add('motion-approach')}}}
+  });
+  const align=scene=>{
+    if(!scene.isConnected||scene.closest('[hidden]'))return;
+    scene.classList.add('motion-aligned');
+    scene.dataset.motionPlayed='true';
+    const win=scene.querySelector('.scene-window-v6');
+    if(!win)return;
+    play(win,[{transform:'perspective(850px) rotateX(6deg) rotateY(-10deg) rotateZ(-4deg) translateY(10px)'},{transform:'perspective(850px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateY(0px)'}],720);
+    const items=win.querySelectorAll('.scene-chat-v6>div,.scene-nodes-v6>span,.scene-products-v6>div,.scene-app-side-v6>span,.scene-mobile-v6>span,.scene-config-v6>div,.assembly-module,.assembly-result,.hybrid-source,.hybrid-output,.custom-code,.custom-ui,.scene-web-hero-v6>div');
+    [...items].slice(0,8).forEach((el,i)=>play(el,[{opacity:.25,transform:'translateY(9px) scale(.97)'},{opacity:1,transform:'translateY(0px) scale(1)'}],430,80+Math.min(i,5)*60));
+  };
+  const transitions=()=>{
+    // Only the changed visual content animates, never the buttons or form inputs.
+    const nodes=[
+      ['#ref-process','#ref-step-nodes .ref-node','[data-ref-step]'],
+      ['#workspace-demo','#workspace-body > *','[data-workspace]'],
+      ['#journey-v5','.journey-steps-v5 article','[data-journey]'],
+      ['#project-showcase','.showcase-info > h3,.showcase-info > p,.preview-placeholder','[data-project]']
+    ];
+    nodes.forEach(([root,sel,trigger])=>{
+      const el=document.querySelector(root);if(!el)return;
+      el.addEventListener('click',e=>{if(!e.target.closest(trigger))return;requestAnimationFrame(()=>{
+        [...el.querySelectorAll(sel)].slice(0,6).forEach((n,i)=>play(n,[{opacity:.45,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0px)'}],300,i*40));
+      })});
+    });
+  };
+  const start=()=>{
+    if(reduce.matches){cards.forEach(s=>s.classList.add('motion-aligned'));return}
+    if(engine?.inView){
+      engine.inView(cards,el=>{align(el)},{amount:.35});
+    }else if('IntersectionObserver'in window){
+      const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){align(e.target);obs.unobserve(e.target)}}),{threshold:.35});cards.forEach(el=>obs.observe(el));
+    }else cards.forEach(align);
+    transitions();
+    document.documentElement.dataset.marketingMotion=engine?.animate?'motion':'native';
+  };
+  // The published site receives a pinned local vendor bundle. No third-party
+  // browser request is needed, and a failed library load never hides content.
+  let begun=false;const begin=()=>{if(begun)return;begun=true;engine=window.Motion||null;start()};
+  if(window.Motion){begin();return}
+  const script=document.createElement('script');script.src='/parsing/marketing/vendor/motion.js';script.async=true;
+  script.onload=begin;script.onerror=begin;document.head.append(script);setTimeout(begin,1200);
+})();
