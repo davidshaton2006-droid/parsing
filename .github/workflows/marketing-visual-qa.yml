@@ -1,0 +1,37 @@
+name: Marketing visual QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'marketing/**'
+      - '.github/scripts/marketing-visual-qa.py'
+      - '.github/workflows/marketing-visual-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: marketing-visual-qa
+  cancel-in-progress: true
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser test dependencies
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Capture and check 36 page and viewport combinations
+        run: python .github/scripts/marketing-visual-qa.py
+      - name: Publish screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketing-visual-review
+          path: test-results/marketing-visual/
+          if-no-files-found: warn
+          retention-days: 7
