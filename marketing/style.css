@@ -46,3 +46,19 @@ body{background:#faf9f6;color:var(--ink)}header{background:#fffefaF5;border-colo
 @media(hover:hover) and (pointer:fine){.has-object-art:hover>.reference-object-art{transform:scale(1.035)}}
 @media(max-width:540px){.visual-stage-v5.has-object-art{aspect-ratio:4/3}.visual-stage-v5.has-object-art>.hero-chips-v5{padding:8px 5px}.audit-art.has-object-art{aspect-ratio:4/3}}
 @media(prefers-reduced-motion:reduce){.reference-object-art{transition:none!important}.has-object-art:hover>.reference-object-art{transform:none}}
+
+/* Original artwork: preserve the entire object, animate only the decorative layer. */
+[data-ref-art].has-object-art{background:#eee4da;border-color:#e7dfd5;overflow:hidden;isolation:isolate}
+.reference-object-art{object-fit:contain;object-position:center;transform-origin:50% 52%;translate:0 0;scale:1;transition:opacity .35s ease,translate .55s cubic-bezier(.22,.7,.2,1),scale .55s cubic-bezier(.22,.7,.2,1)}
+.has-object-art>.reference-object-art{opacity:1;animation:original-art-appear .6s ease-out both}
+@keyframes original-art-appear{from{opacity:0;scale:1.025}to{opacity:1;scale:1}}
+.service-scene-v6.has-object-art{aspect-ratio:4/3;min-height:0;max-height:none}
+.service-scene-v6.has-object-art>.reference-object-art{object-fit:contain}
+.service-scene-v6.has-object-art>.scene-label-v6{position:absolute;z-index:2;left:10px;bottom:10px;right:auto;max-width:calc(100% - 20px);font-size:10px;border-radius:7px;backdrop-filter:blur(5px)}
+.audit-art.has-object-art{aspect-ratio:4/3;min-height:0}
+.audit-art.has-object-art>svg{display:none}
+.visual-stage-v5.has-object-art>.reference-object-art{object-fit:contain}
+.visual-stage-v5.has-object-art>.hero-chips-v5{position:relative;z-index:2;padding-top:24px;background:linear-gradient(transparent,#f2eae0ec)}
+@media(hover:hover) and (pointer:fine){.has-object-art:hover>.reference-object-art{transform:none;translate:var(--art-x,0px) var(--art-y,0px);scale:1.035}}
+@media(max-width:540px){.service-scene-v6.has-object-art{min-height:0;height:auto;aspect-ratio:4/3}.visual-stage-v5.has-object-art{aspect-ratio:4/3}.hero-chips-v5{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.has-object-art>.reference-object-art,.has-object-art:hover>.reference-object-art{animation:none;transition:none!important;translate:none;scale:1;transform:none}}
