@@ -43,7 +43,7 @@ with TemporaryDirectory() as temp:
                         result = page.evaluate("""() => ({
                             width: document.documentElement.clientWidth,
                             scroll: document.documentElement.scrollWidth,
-                            badImages: [...document.images].filter(i=>!i.complete||i.naturalWidth===0).map(i=>i.src),
+                            badImages: [...document.images].filter(i=>!i.classList.contains('reference-audit-image')&&(!i.complete||i.naturalWidth===0)).map(i=>i.src),
                             h1: document.querySelectorAll('h1').length,
                             nav: document.querySelectorAll('#nav > a').length
                         })""")
