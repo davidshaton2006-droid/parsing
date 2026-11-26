@@ -1,3 +1,4 @@
+import './steps-path-entry'
 import React, { useLayoutEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import Provably from './ui/provably'

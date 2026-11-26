@@ -679,3 +679,25 @@ html:has(.liquid-glass-nav){scroll-padding-top:126px}
  .metrics>div{padding:13px}
  .metrics b{font-size:22px}
 }
+
+/* StepsPath — isolated shadcn-style tokens, matching the existing light palette. */
+.steps-path-host{min-width:0}
+.steps-path-mount{min-width:0}
+.steps-path-mount [data-steps-path]{--sp-background:#faf9f6;--sp-card:#fff;--sp-foreground:#20233a;--sp-border:#e4e2df;--sp-muted:#eeebe5;--sp-muted-foreground:#626575;--sp-primary-rgb:52 67 183;--sp-primary-foreground:#fff;--sp-ring:#3443b7;--primary:rgb(var(--sp-primary-rgb));color:var(--sp-foreground)}
+.steps-path-mount [data-steps-path].dark{--sp-background:#20233a;--sp-card:#292e48;--sp-foreground:#f8f6f1;--sp-border:#50556d;--sp-muted:#353b56;--sp-muted-foreground:#d1d2df;--sp-primary-rgb:105 120 230;--sp-primary-foreground:#fff;--sp-ring:#b7c0ff}
+.steps-path-mount button{border-style:solid;border-width:0;flex-shrink:0;color:inherit}
+.steps-path-mount .border{border-style:solid;border-width:1px}
+.steps-path-mount .border-2{border-style:solid;border-width:2px}
+.steps-path-mount .border-\[3px\]{border-style:solid;border-width:3px}
+.steps-path-mount ul{padding:0;margin:0;list-style:none}
+.steps-path-mount li{margin:0}
+.steps-path-mount h3{overflow-wrap:anywhere}
+.steps-path-mount [aria-hidden="true"]{pointer-events:none}
+.steps-path-mount [role="slider"]{touch-action:none}
+.steps-path-fallback{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;list-style:none;padding:0;margin:0}
+.steps-path-fallback[hidden]{display:none}
+.steps-path-fallback li{padding:24px;border:1px solid var(--line);border-radius:20px;background:#fff}
+.steps-path-fallback p{margin-top:8px;color:var(--muted)}
+.steps-path-cta{display:flex;justify-content:center;margin-top:22px}
+@media(max-width:767px){.steps-path-fallback{grid-template-columns:1fr}.steps-path-mount [data-steps-path]>section{padding-inline:12px}.steps-path-mount h3{font-size:clamp(20px,5.2vw,25px)}.steps-path-mount li>div{padding:18px}}
+@media(max-width:360px){.steps-path-mount [data-steps-path]>section{padding-inline:8px}.steps-path-mount li>div{padding:15px}}
