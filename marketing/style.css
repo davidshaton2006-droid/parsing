@@ -144,3 +144,8 @@ body{background:#faf9f6;color:var(--ink)}header{background:#fffefaF5;border-colo
 .peak-chart-host [data-peak-chart] button:focus-visible,.peak-workspace-host [data-peak-chart] button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 @media(max-width:680px){.peak-chart-grid{grid-template-columns:1fr;padding:12px 7px;gap:8px}.peak-workspace-host{padding:5px}.peak-chart-cell,.peak-workspace-cell{min-width:0}}
 @media(prefers-reduced-motion:reduce){.peak-chart-host *, .peak-workspace-host *{transition:none!important}}
+
+.peak-enhanced .ref-chart-legend span:first-child i{background:#b99756}
+.peak-enhanced .ref-chart-legend span:nth-child(2) i{background:#4f8ef7}
+.peak-enhanced .ref-chart-end>div:first-child b{color:#9a773d}
+.peak-enhanced .ref-chart-end>div:nth-child(2) b{color:#3443b7}
