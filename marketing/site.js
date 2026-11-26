@@ -31,3 +31,5 @@ img.addEventListener('load',()=>{if(img.naturalWidth>0)target.classList.add('has
 target.prepend(img);img.src=url;
 });
 }).catch(()=>{});})();
+
+;(()=>{if(!matchMedia('(hover:hover) and (pointer:fine)').matches||matchMedia('(prefers-reduced-motion: reduce)').matches)return;document.querySelectorAll('[data-ref-art]').forEach(el=>{let raf=0;el.addEventListener('pointermove',event=>{if(!el.classList.contains('has-object-art'))return;const rect=el.getBoundingClientRect();const x=Math.max(-1,Math.min(1,(event.clientX-rect.left)/rect.width*2-1)),y=Math.max(-1,Math.min(1,(event.clientY-rect.top)/rect.height*2-1));cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{el.style.setProperty('--art-x',(x*4).toFixed(2)+'px');el.style.setProperty('--art-y',(y*3).toFixed(2)+'px')})});el.addEventListener('pointerleave',()=>{cancelAnimationFrame(raf);el.style.setProperty('--art-x','0px');el.style.setProperty('--art-y','0px')})})})();
