@@ -282,3 +282,16 @@ target.prepend(img);img.src=url;
   });
   observer.observe(document.body,{childList:true,subtree:true});
 })();
+
+/* Progressive enhancement: the original HTML hero remains if either asset fails. */
+;(()=>{
+  if(!document.querySelector('.hero')||document.querySelector('link[data-provably-css]'))return;
+  const style=document.createElement('link');style.rel='stylesheet';style.href='/parsing/marketing/vendor/provably.css';style.dataset.provablyCss='';
+  style.addEventListener('load',()=>{
+    const script=document.createElement('script');script.src='/parsing/marketing/vendor/provably.js';script.async=true;script.dataset.provablyJs='';
+    script.addEventListener('error',()=>{document.documentElement.dataset.provably='fallback'});
+    document.head.append(script);
+  },{once:true});
+  style.addEventListener('error',()=>{document.documentElement.dataset.provably='fallback'},{once:true});
+  document.head.append(style);
+})();
