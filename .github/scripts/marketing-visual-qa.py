@@ -36,6 +36,7 @@ with TemporaryDirectory() as temp:
                     try:
                         resp = page.goto(base + route, wait_until="load", timeout=20000)
                         assert_page(resp and resp.ok, "page response failed")
+                        page.wait_for_function("document.documentElement.dataset.provably==='ready'",timeout=12000)
                         page.evaluate("document.fonts.ready")
                         # Verify the actual artwork declared in the local manifest.
                         # Lazy images are explicitly scrolled into view before checking.
@@ -77,6 +78,21 @@ with TemporaryDirectory() as temp:
                         assert_page(page.locator("[data-glow]").count()>=8,"missing page-wide spotlight surfaces")
                         assert_page(page.locator(".tile:not([data-glow]),.story-tile-v5:not([data-glow]),.ref-project:not([data-glow])").count()==0,"uncovered card")
                         assert_page(page.locator(".hero[data-glow]").count()==1,"hero spotlight")
+                        assert_page(page.locator("[data-slot=provably]").count()==1,"missing shared Provably hero")
+                        assert_page(page.locator(".cv-cert").count()==3,"missing page-specific stack")
+                        switch=page.locator(".cv-toggle")
+                        assert_page(switch.is_visible(),"color switch not visible")
+                        before=switch.get_attribute("aria-checked")
+                        switch.click()
+                        page.wait_for_function("(before)=>document.querySelector('.cv-toggle').getAttribute('aria-checked')!==before",arg=before,timeout=3000)
+                        page.wait_for_function("document.querySelector('.cv-wave').dataset.state==='clear'",timeout=3000)
+                        page.locator(".cv-cert[tabindex='0']").click()
+                        page.locator(".cv-dialog [role=dialog]").wait_for(state="visible",timeout=3000)
+                        page.locator(".cv-dialog button[aria-label='Закрыть карточку']").click()
+                        page.locator(".cv-dialog [role=dialog]").wait_for(state="hidden",timeout=4000)
+                        page.evaluate("window.scrollTo(0,0)")
+                        if width in (390,1440):
+                            page.locator(".hero").screenshot(path=str(OUT / f"{name}-{width}-provably-color.png"),animations="disabled")
                         assert_page(page.locator(".hero").evaluate("(e)=>getComputedStyle(e,'::after').opacity")== "0","reduced motion must suppress spotlight")
 
                         assert_page(bar.locator("a[aria-current=page]").evaluate("(e)=>e.classList.contains('lgt-on')"), "current route not selected")
@@ -173,6 +189,7 @@ with TemporaryDirectory() as temp:
                 try:
                     page.goto(base, wait_until="load", timeout=20000)
                     page.wait_for_function("document.documentElement.dataset.marketingMotion === 'motion'", timeout=10000)
+                    page.wait_for_function("document.documentElement.dataset.provably==='ready'",timeout=12000)
                     for scene in page.locator(".service-scene-v6").all():
                         scene.scroll_into_view_if_needed()
                         scene.locator(".scene-window-v6").wait_for(state="visible")
@@ -195,7 +212,7 @@ with TemporaryDirectory() as temp:
                         page.mouse.move(x0+60,y0)
                         page.wait_for_function("({el,first})=>Math.abs(parseFloat(el.style.getPropertyValue('--spot-x'))-first)>25",arg={"el":card.element_handle(),"first":first},timeout=2500)
                         assert_page(card.evaluate("(e)=>getComputedStyle(e,'::after').pointerEvents")=="none","spotlight blocks controls")
-                        assert_page(card.evaluate("(e)=>getComputedStyle(e,'::after').maskComposite")=="exclude","border mask is missing")
+                        assert_page(card.evaluate("(e)=>{const s=getComputedStyle(e,'::after');return s.maskImage.includes('linear-gradient') && /exclude|xor/.test(s.maskComposite+' '+s.webkitMaskComposite)}"),"border mask is missing")
                         page.locator(".service-bento").screenshot(path=str(OUT/"spotlight-desktop.png"),animations="disabled")
                         page.mouse.move(1,1)
                     # Test the actual spring, including interruption, and navigation to another page.
