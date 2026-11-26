@@ -184,6 +184,15 @@ with TemporaryDirectory() as temp:
                                 page.locator("#integration-range").evaluate("(e)=>{e.value=3;e.dispatchEvent(new Event('input',{bubbles:true}))}")
                                 assert_page(page.locator("#budget-integrations").input_value() == "3", "integration slider")
                                 assert_page("30" in page.locator("#cost-extra-label").inner_text(), "integration value")
+                            elif name == "catalog":
+                                page.locator("#category").select_option("ai")
+                                assert_page(page.locator("#filter-grid #ai").is_visible(), "AI commercial need")
+                                assert_page(page.locator("#filter-grid #web").is_hidden(), "unrelated service filtered")
+                                page.locator("#search").fill("RAG")
+                                assert_page(page.locator("#filter-grid #ai").is_visible(), "search and commercial need combine")
+                                page.locator("#search").fill("")
+                                page.locator("#category").select_option("")
+                                assert_page(page.locator("#filter-grid .filter-item:visible").count()==8,"reset all service directions")
                             elif name == "partners":
                                 for ident, value in [("pc-count",5),("pc-price",100000),("pc-rate",0.35),("pc-clients",10),("pc-support",20000)]:
                                     page.locator("#"+ident).evaluate("(e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}))}",value)
