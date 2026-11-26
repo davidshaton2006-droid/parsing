@@ -165,6 +165,9 @@ jobs:
       - name: Build Peak Chart frontend bundle
         run: bash .github/scripts/marketing-peak-chart-build.sh "$RUNNER_TEMP/pages/marketing"
 
+      - name: Build shared Provably hero module
+        run: bash .github/scripts/marketing-provably-build.sh "$RUNNER_TEMP/pages/marketing"
+
       - name: Capture actual desktop and mobile portfolio previews
         continue-on-error: true
         timeout-minutes: 6
