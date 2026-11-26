@@ -1,1 +1,6 @@
-{}
+{
+  "audit": "/parsing/marketing/assets/reference/audit.webp",
+  "web": "/parsing/marketing/assets/reference/web.webp",
+  "panel": "/parsing/marketing/assets/reference/panel.webp",
+  "analytics": "/parsing/marketing/assets/reference/analytics.webp"
+}
