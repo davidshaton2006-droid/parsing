@@ -10,6 +10,7 @@ permissions:
   contents: read
   actions: read
   statuses: write
+  pages: write
 
 concurrency:
   group: actions-failure-inventory
@@ -18,7 +19,7 @@ concurrency:
 jobs:
   inventory:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - name: Expose audit run link and inventory failed jobs
         uses: actions/github-script@v7
@@ -30,7 +31,14 @@ jobs:
             await status('pending');
             try {
               const response=await github.rest.actions.listWorkflowRunsForRepo({...repo,per_page:100});
-              const latest=(response.data.workflow_runs ?? response.data).slice(0,100);
+              const total=response.data.total_count ?? response.data.length;
+              core.info('Repository total run count: '+total);
+              const latest=[...(response.data.workflow_runs ?? response.data)];
+              for(let page=2;page<=3&&latest.length<total;page++){
+                const next=await github.rest.actions.listWorkflowRunsForRepo({...repo,per_page:100,page});
+                const batch=next.data.workflow_runs ?? next.data;
+                latest.push(...batch);if(batch.length<100)break;
+              }
               const inventory=[];
               for(const run of latest){
                 const item={id:run.id,name:run.name,sha:run.head_sha,event:run.event,status:run.status,conclusion:run.conclusion,url:run.html_url,jobs:[]};
@@ -44,9 +52,28 @@ jobs:
                 core.info(JSON.stringify(item));
               }
               require('fs').writeFileSync('actions-inventory.json',JSON.stringify(inventory,null,2));
-              await core.summary.addHeading('Recent Actions runs (up to 100)').addTable([[{data:'Workflow',header:true},{data:'Run',header:true},{data:'Status',header:true},{data:'Failed steps',header:true}],...inventory.map(i=>[i.name,String(i.id),String(i.conclusion||i.status),i.jobs.flatMap(j=>j.steps?.map(s=>s.name)||[j.name]).join(', ')])]).write();
+              await core.summary.addHeading('Recent Actions runs (up to 300)').addTable([[{data:'Workflow',header:true},{data:'Run',header:true},{data:'Status',header:true},{data:'Failed steps',header:true}],...inventory.map(i=>[i.name,String(i.id),String(i.conclusion||i.status),i.jobs.flatMap(j=>j.steps?.map(s=>s.name)||[j.name]).join(', ')])]).write();
               await status('success');
             }catch(e){await status('failure');throw e;}
+      - name: Verify and correct the Pages publishing source
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo=context.repo;
+            const pages=await github.request('GET /repos/{owner}/{repo}/pages',repo);
+            core.info('PAGES BEFORE '+JSON.stringify({build_type:pages.data.build_type,source:pages.data.source,status:pages.data.status,html_url:pages.data.html_url}));
+            if(pages.data.build_type!=='workflow'){
+              // The project uses a custom Pages artifact (Vite apps and compiled vendor bundles).
+              // Branch publishing serves unbuilt source and can overwrite the custom deployment.
+              if(pages.data.source?.branch!=='main'||pages.data.source?.path!=='/'){
+                core.setFailed('Unexpected Pages publishing source; not modified');
+                return;
+              }
+              await github.request('PUT /repos/{owner}/{repo}/pages',{...repo,build_type:'workflow'});
+            }
+            const result=await github.request('GET /repos/{owner}/{repo}/pages',repo);
+            core.info('PAGES AFTER '+JSON.stringify({build_type:result.data.build_type,source:result.data.source,status:result.data.status,html_url:result.data.html_url}));
+            if(result.data.build_type!=='workflow')core.setFailed('GitHub Pages must publish the Actions artifact');
       - name: Upload inventory
         if: always()
         uses: actions/upload-artifact@v4
