@@ -7,6 +7,8 @@ on:
     paths:
       - 'st-car/**'
       - 'index.html'
+      - 'marketing/**'
+      - '.github/scripts/**'
       - 'apps/chizh-avto/**'
       - 'apps/doctor-car/**'
       - '.github/workflows/deploy-pages.yml'
@@ -19,7 +21,7 @@ permissions:
 
 concurrency:
   group: github-pages-${{ github.event_name == 'pull_request' && github.head_ref || 'main' }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
@@ -116,6 +118,10 @@ jobs:
           test -s dist/visual/tech-car.svg
           test -d dist/assets
 
+      - name: Install Doctor Car Chromium version
+        working-directory: apps/doctor-car
+        run: npx playwright install --with-deps chromium
+
       - name: Test Doctor Car interactions on desktop and mobile
         working-directory: apps/doctor-car
         run: npm run test
@@ -154,44 +160,6 @@ jobs:
 
       - name: Build Peak Chart frontend bundle
         run: bash .github/scripts/marketing-peak-chart-build.sh "$RUNNER_TEMP/pages/marketing"
-
-      - name: Restore original marketing 3D artwork
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.temp }}/marketing-render-cache
-          key: marketing-3d-studio-v2-${{ hashFiles('.github/scripts/marketing-render-3d.py') }}
-
-      - name: Generate and package original marketing 3D scenes
-        continue-on-error: true
-        timeout-minutes: 16
-        env:
-          OPENBLAS_NUM_THREADS: '1'
-        run: |
-          set -e
-          cache="$RUNNER_TEMP/marketing-render-cache"
-          mkdir -p "$cache"
-          python3 -m venv "$RUNNER_TEMP/marketing-render-env"
-          "$RUNNER_TEMP/marketing-render-env/bin/pip" -q install numpy pillow
-          for scene in architecture journey partnership portfolio ai-core automation-flow commerce mobile-app integration-hub knowledge-vault; do
-            if [ ! -s "$cache/$scene.webp" ]; then
-              width=560
-              case "$scene" in architecture|journey|partnership|portfolio) width=960 ;; esac
-              "$RUNNER_TEMP/marketing-render-env/bin/python" .github/scripts/marketing-render-3d.py "$cache" --width "$width" --scene "$scene" || echo "Fallback retained for $scene"
-            fi
-          done
-          python3 - "$cache" "$RUNNER_TEMP/pages/marketing/assets/reference" <<'PY'
-          from pathlib import Path
-          import json, shutil, sys
-          source, dest = map(Path, sys.argv[1:])
-          manifest = dest / 'manifest.json'
-          data = json.loads(manifest.read_text())
-          for key in ('architecture','journey','partnership','portfolio','ai-core','automation-flow','commerce','mobile-app','integration-hub','knowledge-vault'):
-              art = source / (key + '.webp')
-              if art.is_file() and art.stat().st_size > 1000:
-                  shutil.copyfile(art, dest / art.name)
-                  data[key] = '/parsing/marketing/assets/reference/' + art.name
-          manifest.write_text(json.dumps(data, indent=2))
-          PY
 
       - name: Capture actual desktop and mobile portfolio previews
         continue-on-error: true
