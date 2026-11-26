@@ -105,3 +105,96 @@ target.prepend(img);img.src=url;
   const script=document.createElement('script');script.src='/parsing/marketing/vendor/motion.js';script.async=true;
   script.onload=begin;script.onerror=begin;document.head.append(script);setTimeout(begin,1200);
 })();
+
+/* LiquidGlassTabBar — seven-item native DOM adaptation of the supplied React component.
+   Original damped spring: z=.53, wn=11.1, ~14% overshoot, settles at 1.2s. */
+;(()=>{
+  const nav=document.getElementById('nav');
+  if(!nav||nav.classList.contains('liquid-glass-nav'))return;
+  const links=[...nav.querySelectorAll(':scope > a')];
+  const directions=nav.querySelector(':scope > .mega-toggle');
+  const panel=nav.querySelector(':scope > .mega');
+  if(links.length!==6||!directions||!panel)return;
+  const items=[...links,directions],count=items.length;
+  const labels=['Главная','Каталог','Решения','Стоимость','Партнёрам','Портфолио','Направления'];
+  const icons=[
+    '<path fill="currentColor" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" d="M12 2.7 22 10v11H16v-4.5a3.5 3.5 0 0 0-3.5-3.5h-1A3.5 3.5 0 0 0 8 16.5V21H2V10Z"/>',
+    '<g fill="currentColor"><rect x="2" y="2" width="9" height="9" rx="2.4"/><rect x="13" y="2" width="9" height="9" rx="2.4"/><rect x="2" y="13" width="9" height="9" rx="2.4"/><rect x="13" y="13" width="9" height="9" rx="2.4"/></g>',
+    '<path fill="currentColor" d="M8.5 2.2a3.5 3.5 0 0 1 7 0v2H20a2 2 0 0 1 2 2v4.2h-2a3.5 3.5 0 0 0 0 7h2V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6.2a2 2 0 0 1 2-2h4.5Z"/>',
+    '<path d="M8 22V3h6.4a5.2 5.2 0 0 1 0 10.4H5M5 17h11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
+    '<g fill="currentColor"><circle cx="12" cy="6.2" r="5"/><path d="M2 21a10 10 0 0 1 20 0v1H2Z"/></g>',
+    '<g fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2.5"/><path d="M12 17v4M7 21h10"/></g>',
+    '<g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M12 2v20M2 12h20M8 6l4-4 4 4M8 18l4 4 4-4M6 8l-4 4 4 4M18 8l4 4-4 4"/></g>'
+  ];
+  const current=Math.max(0,links.findIndex(a=>a.hasAttribute('aria-current')));
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  const track=document.createElement('div');track.className='lgt-track';
+  const lens=document.createElement('div');lens.className='lgt-lens';lens.setAttribute('aria-hidden','true');
+  lens.innerHTML='<div class="lgt-clip"><div class="lgt-glass"></div><div class="lgt-refracted"></div><div class="lgt-band lgt-band-top"></div><div class="lgt-band lgt-band-bottom"></div><div class="lgt-glow"></div></div><div class="lgt-rim"></div>';
+  track.append(lens);
+  items.forEach((el,i)=>{
+    el.classList.add('lgt-item');el.dataset.lgtIndex=String(i);
+    el.setAttribute('aria-label',labels[i]);el.title=labels[i];
+    el.innerHTML='<svg class="lgt-icon" viewBox="0 0 24 24" aria-hidden="true">'+icons[i]+'</svg><span class="lgt-label">'+labels[i]+'</span>';
+    track.append(el);
+  });
+  nav.insertBefore(track,panel);nav.classList.add('liquid-glass-nav');
+  panel.id='liquid-glass-directions';directions.setAttribute('aria-controls',panel.id);
+  let selected=current,raf=0,redirect=0,cell=1,lensWidth=1,cur={lens:0,x:[]};
+  const target=n=>{
+    const w=track.clientWidth;
+    // Expand the active cell on compact layouts to make the Russian label fit.
+    const extra=w<440?Math.min(cell*.62,28):0;
+    const base=(w-extra)/count;
+    const centers=Array.from({length:count},(_,i)=>base*(i+.5)+(i>n?extra:i===n?extra/2:0));
+    const shift=cell*.055;
+    centers.forEach((v,i)=>{if(i!==n)centers[i]=v+(i<n?-1:1)*shift*Math.exp(-Math.abs(i-n)*.5)});
+    return {lens:centers[n],x:centers,activeWidth:base+extra,base};
+  };
+  const paint=()=>{
+    lens.style.transform='translate3d('+(cur.lens-lensWidth/2)+'px,0,0)';
+    items.forEach((el,i)=>{el.style.left=cur.x[i]+'px'});
+  };
+  const size=()=>{
+    if(!track.clientWidth)return;
+    cancelAnimationFrame(raf);
+    cell=track.clientWidth/count;const to=target(selected);
+    lensWidth=Math.max(cell*1.16,to.activeWidth+5);
+    lens.style.width=lensWidth+'px';
+    items.forEach((el,i)=>{el.style.width=(i===selected?to.activeWidth:to.base)+'px'});
+    cur={lens:to.lens,x:to.x.slice()};paint();
+  };
+  const spring=t=>{const z=.53,wn=11.1,wd=wn*Math.sqrt(1-z*z),k=z/Math.sqrt(1-z*z);return t<=0?0:1-Math.exp(-z*wn*t)*(Math.cos(wd*t)+k*Math.sin(wd*t))};
+  const select=n=>{
+    if(n<0||n>=count)return;
+    selected=n;
+    items.forEach((el,i)=>el.classList.toggle('lgt-on',i===n));
+    track.dataset.active=String(n);
+    cancelAnimationFrame(raf);
+    const to=target(n),from={lens:cur.lens,x:cur.x.slice()};
+    lensWidth=Math.max(cell*1.16,to.activeWidth+5);lens.style.width=lensWidth+'px';
+    items.forEach((el,i)=>{el.style.width=(i===n?to.activeWidth:to.base)+'px'});
+    if(reduce.matches||!from.x.length){cur={lens:to.lens,x:to.x.slice()};paint();return}
+    const t0=performance.now();
+    const tick=now=>{
+      const t=(now-t0)/1000,p=t>=1.2?1:spring(t);
+      cur={lens:from.lens+(to.lens-from.lens)*p,x:from.x.map((v,i)=>v+(to.x[i]-v)*p)};
+      paint();if(t<1.2)raf=requestAnimationFrame(tick);
+    };
+    raf=requestAnimationFrame(tick);
+  };
+  size();select(current);
+  if('ResizeObserver'in window)new ResizeObserver(size).observe(track);
+  else window.addEventListener('resize',size);
+  links.forEach((el,i)=>el.addEventListener('click',e=>{
+    if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||el.target==='_blank')return;
+    clearTimeout(redirect);
+    if(el.href===location.href){e.preventDefault();panel.hidden=true;select(current);return}
+    if(reduce.matches)return;
+    e.preventDefault();panel.hidden=true;select(i);
+    redirect=setTimeout(()=>location.assign(el.href),440);
+  }));
+  directions.addEventListener('click',()=>{clearTimeout(redirect);select(panel.hidden?current:6)});
+  new MutationObserver(()=>{if(panel.hidden&&selected===6)select(current);else if(!panel.hidden&&selected!==6)select(6)}).observe(panel,{attributes:true,attributeFilter:['hidden']});
+  window.addEventListener('pageshow',()=>{clearTimeout(redirect);panel.hidden=true;directions.setAttribute('aria-expanded','false');select(current)});
+})();
