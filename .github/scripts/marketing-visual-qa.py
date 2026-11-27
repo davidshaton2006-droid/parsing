@@ -300,6 +300,20 @@ with TemporaryDirectory() as temp:
                     page.locator(".motion-approach").first.screenshot(path=str(OUT / f"motion-approach-{width}.png"), animations="disabled")
                     path=page.locator('[data-steps-path]')
                     path.scroll_into_view_if_needed()
+                    surface=path.locator('section[aria-roledescription="carousel"]')
+                    page.wait_for_function("()=>document.querySelector('.steps-path-mount section[aria-roledescription=carousel]')?.hasAttribute('data-glow')")
+                    assert_page(page.locator(".steps-path-host[data-glow],.steps-path-cta[data-glow]").count()==0,"spotlight must not extend to CTA")
+                    geometry=surface.evaluate("""e=>{
+                        const s=getComputedStyle(e),p=getComputedStyle(e,'::after'),f=getComputedStyle(e,'::before'),r=e.getBoundingClientRect(),cta=e.closest('.steps-path-host').querySelector('.steps-path-cta').getBoundingClientRect();
+                        return {radius:s.borderTopLeftRadius,after:p.borderTopLeftRadius,before:f.borderTopLeftRadius,position:s.position,overflow:s.overflow,offsets:[p.top,p.right,p.bottom,p.left],separate:cta.top>=r.bottom,pointer:p.pointerEvents}
+                    }""")
+                    assert_page(geometry["radius"]=="24px" and geometry["after"]==geometry["radius"] and geometry["before"]==geometry["radius"],"rounded StepsPath spotlight: "+str(geometry))
+                    assert_page(geometry["position"]=="relative" and geometry["overflow"]=="hidden" and geometry["offsets"]==["0px"]*4 and geometry["separate"] and geometry["pointer"]=="none","spotlight bounded to panel: "+str(geometry))
+                    surface.scroll_into_view_if_needed()
+                    sb=surface.bounding_box()
+                    page.mouse.move(sb["x"]+16,max(1,min(899,sb["y"]+sb["height"]/2)))
+                    page.wait_for_function("(el)=>el.classList.contains('spotlight-active')",arg=surface.element_handle(),timeout=2500)
+                    surface.screenshot(path=str(OUT/f"steps-spotlight-{width}.png"),animations="disabled")
                     assert_step_icon_centers(page)
                     # The supplied 3D carousel must retain its visible next card.
                     neighbor=path.locator('li[aria-roledescription=slide]').nth(1)

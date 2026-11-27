@@ -219,7 +219,7 @@ target.prepend(img);img.src=url;
     '.hero','.tile','.story-tile-v5','.ref-project','.rows','.rows > article',
     '.metrics','.metrics > div','.faq','.faq > details','.promo','.contact',
     '.experience > article','.audit-offer','.audit-board','.economy-panel','.economy-result',
-    '.workspace-demo','.workspace-content','.workspace-kpis > div','.steps-path-host',
+    '.workspace-demo','.workspace-content','.workspace-kpis > div','.steps-path-mount [data-steps-path] > section',
     '.ref-chart-board','.journey-v5','.journey-steps-v5 > article',
     '.club-demo','.club-screen','.club-product','.club-cart',
     '.calc','.calc-result','.flow','.table-wrap','.tier-simulator','.tier-result',
