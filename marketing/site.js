@@ -216,7 +216,7 @@ target.prepend(img);img.src=url;
 ;(()=>{
   const root=document.documentElement;
   const selector=[
-    '.hero','.tile','.story-tile-v5','.ref-project','.rows','.rows > article',
+    '.hero','.tile','.mb-feature-card','.story-tile-v5','.ref-project','.rows','.rows > article',
     '.metrics','.metrics > div','.faq','.faq > details','.promo','.contact',
     '.experience > article','.audit-offer','.audit-board','.economy-panel','.economy-result',
     '.workspace-demo','.workspace-content','.workspace-kpis > div','.steps-path-mount [data-steps-path] > section',

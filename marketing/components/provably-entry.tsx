@@ -1,3 +1,4 @@
+import './feature-bento-entry'
 import './steps-path-entry'
 import React, { useLayoutEffect } from 'react'
 import { createRoot } from 'react-dom/client'

@@ -30,6 +30,11 @@ module.exports = {
 EOF
 (cd "$scratch" && node_modules/.bin/tailwindcss -c steps-tailwind.config.cjs -i input.css -o "$scratch/steps.css" --minify)
 cat "$scratch/steps.css" >> "$out/provably.css"
+cat > "$scratch/bento-tailwind.config.cjs" <<'EOF'
+module.exports = { content: ['./components/ui/marketing-feature-bento.tsx','./components/feature-bento-entry.tsx'], important: '.feature-bento-mount', corePlugins: { preflight: false }, theme: { extend: {} } }
+EOF
+(cd "$scratch" && node_modules/.bin/tailwindcss -c bento-tailwind.config.cjs -i input.css -o "$scratch/bento.css" --minify)
+cat "$scratch/bento.css" >> "$out/provably.css"
 test -s "$out/provably.js"
 test -s "$out/provably.css"
 node --check "$out/provably.js"

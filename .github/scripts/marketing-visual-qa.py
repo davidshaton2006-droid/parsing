@@ -60,6 +60,12 @@ with TemporaryDirectory() as temp:
                         page.evaluate("document.fonts.ready")
                         if name == "home":
                             page.wait_for_selector('[data-steps-ready="true"]', timeout=12000)
+                            page.wait_for_selector('[data-bento-ready="true"]',timeout=12000)
+                            bento=page.locator('[data-marketing-bento]')
+                            assert_page(bento.locator('a.mb-feature-card').count()==8,"eight service directions")
+                            assert_page(bento.locator('.mb-visual').count()==8,"eight visual illustrations")
+                            assert_page(bento.evaluate("""e=>[...e.querySelectorAll('a.mb-feature-card')].every(a=>{const b=a.getBoundingClientRect();return b.width>0&&b.height>0&&b.left>=-1&&b.right<=innerWidth+1&&a.querySelector('h3').textContent.trim()&&a.querySelector('.mb-description').textContent.trim()&&a.href.includes('/catalog/#')})"""),"bento content and viewport fit")
+                            assert_page(page.locator('[data-bento-fallback]').evaluate("(e)=>e.hidden&&getComputedStyle(e).display==='none'"),"legacy bento hidden")
                             assert_step_icon_centers(page)
                         # Verify the actual artwork declared in the local manifest.
                         # Lazy images are explicitly scrolled into view before checking.
@@ -291,11 +297,13 @@ with TemporaryDirectory() as temp:
                     page.goto(base, wait_until="load", timeout=20000)
                     page.wait_for_function("document.documentElement.dataset.marketingMotion === 'motion'", timeout=10000)
                     page.wait_for_function("document.documentElement.dataset.provably==='ready'",timeout=12000)
-                    for scene in page.locator(".service-scene-v6").all():
-                        scene.scroll_into_view_if_needed()
-                        scene.locator(".scene-window-v6").wait_for(state="visible")
-                        page.wait_for_function("(el)=>el.dataset.motionPlayed === 'true'", arg=scene.element_handle(), timeout=7000)
-                        assert_page(scene.locator("img.reference-object-art").count()==0, "static art hides animated interface")
+                    bento=page.locator('[data-marketing-bento]')
+                    bento.wait_for(state="visible",timeout=12000)
+                    for feature in bento.locator('.mb-feature-card').all():
+                        feature.scroll_into_view_if_needed()
+                        feature.locator('.mb-visual').wait_for(state="visible")
+                        assert_page(feature.evaluate("(e)=>{const v=e.querySelector('.mb-visual').getBoundingClientRect(),b=e.getBoundingClientRect();return v.width>0&&v.height>0&&v.left>=b.left-1&&v.right<=b.right+1}"),"bento visual fits")
+                    bento.screenshot(path=str(OUT/f"marketing-bento-{width}.png"),animations="disabled")
                     assert_page(page.locator(".motion-approach").count()==3, "distinct approach scenes")
                     page.locator(".motion-approach").first.screenshot(path=str(OUT / f"motion-approach-{width}.png"), animations="disabled")
                     path=page.locator('[data-steps-path]')
@@ -325,7 +333,7 @@ with TemporaryDirectory() as temp:
                     path.screenshot(path=str(OUT/f"steps-icons-motion-{width}.png"),animations="disabled")
                     # Test pointer light and the independently rendered border without intercepting input.
                     if width==1440:
-                        card=page.locator(".service-bento > .tile").first
+                        card=page.locator("[data-marketing-bento] .mb-feature-card").first
                         card.scroll_into_view_if_needed()
                         box=card.bounding_box()
                         assert_page(box is not None,"spotlight card has no layout")
@@ -339,7 +347,7 @@ with TemporaryDirectory() as temp:
                         page.wait_for_function("({el,first})=>Math.abs(parseFloat(el.style.getPropertyValue('--spot-x'))-first)>25",arg={"el":card.element_handle(),"first":first},timeout=2500)
                         assert_page(card.evaluate("(e)=>getComputedStyle(e,'::after').pointerEvents")=="none","spotlight blocks controls")
                         assert_page(card.evaluate("(e)=>{const s=getComputedStyle(e,'::after');return s.maskImage.includes('linear-gradient') && /exclude|xor/.test(s.maskComposite+' '+s.webkitMaskComposite)}"),"border mask is missing")
-                        page.locator(".service-bento").screenshot(path=str(OUT/"spotlight-desktop.png"),animations="disabled")
+                        page.locator("[data-marketing-bento]").screenshot(path=str(OUT/"spotlight-desktop.png"),animations="disabled")
                         page.mouse.move(1,1)
                     if width==1440:
                         connector=page.locator("[data-pinned-approach] .pinned-connector path")
