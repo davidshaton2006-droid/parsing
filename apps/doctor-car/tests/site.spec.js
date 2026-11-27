@@ -7,7 +7,7 @@ test('hero and real-service contacts with honest demo attribution',async({page})
  await expect(page.getByRole('heading',{level:1})).toContainText('ДОКТОР КАР');
  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
  await expect(page.getByRole('link',{name:/Карточка организации/})).toHaveAttribute('href',/114732639406/);
- await expect(page.getByRole('link',{name:/Позвонить/}).last()).toHaveAttribute('href','tel:+79184534100');
+ await expect(page.getByRole('link',{name:/Позвонить/}).last()).toHaveAttribute('href','tel:+79586092157');
  await expect(page.locator('.hero-car')).toHaveAttribute('alt',/не фото автосервиса/);
  await expect(page.locator('.float-diagnostics')).toBeVisible();
  expect(errors).toEqual([]);

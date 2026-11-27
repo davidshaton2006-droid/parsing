@@ -7,7 +7,7 @@ The distinct visual narratives are: car-photo hero + interactive system cards; 6
 
 ## Factual sources and demo limitations
 Business listing: https://yandex.ru/maps/org/doktor_kar/114732639406/
-Address Krasnodar, ul. imeni Zhloby, 24. Phone +7 (918) 453-41-00 from an external public catalog, to be confirmed directly. Hours 09:00–20:00 from catalog, check before visit.
+Current 28 November 2026 Yandex Maps listing identifies Krasnodar, ul. imeni Zhloby, 50 (moved from No. 24), phone +7 (958) 609-21-57. Other directories still show the old address/phone; the up-to-date Yandex listing takes precedence. Published hours may vary; verify before visiting. Sources: https://yandex.kz/maps/org/doktor_kar/114732639406/ and https://yandex.kz/maps/ru/org/doktor_kar/1281207888/?lang=ru .
 Services follow the original project notes and do not imply guaranteed parts, pricing, warranties, staff credentials or unverified reviews.
 Email mail@dr-car.ru is only mentioned by an external catalog and should be confirmed. There is **no backend booking**. The form prepares a mailto draft or allows copying; users must send the inquiry themselves.
 
