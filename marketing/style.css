@@ -701,3 +701,26 @@ html:has(.liquid-glass-nav){scroll-padding-top:126px}
 .steps-path-cta{display:flex;justify-content:center;margin-top:22px}
 @media(max-width:767px){.steps-path-fallback{grid-template-columns:1fr}.steps-path-mount [data-steps-path]>section{padding-inline:12px}.steps-path-mount h3{font-size:clamp(20px,5.2vw,25px)}.steps-path-mount li>div{padding:18px}}
 @media(max-width:360px){.steps-path-mount [data-steps-path]>section{padding-inline:8px}.steps-path-mount li>div{padding:15px}}
+
+/* StepsPath geometry: one shared horizontal coordinate system, independently of viewport size. */
+.steps-path-mount .sp-track{height:62px;margin:18px 22px 16px;position:relative;isolation:isolate}
+.steps-path-mount .sp-track-base,.steps-path-mount .sp-track-fill{position:absolute;top:50%;left:0;height:5px;transform:translateY(-50%);border-radius:99px;pointer-events:none}
+.steps-path-mount .sp-track-base{width:100%;background:var(--sp-border)}
+.steps-path-mount .sp-track-fill{background:linear-gradient(90deg,var(--primary),var(--sp-gold))}
+.steps-path-mount .sp-marker{top:50%;transform:translate(-50%,-50%);width:40px;height:40px;padding:0;background:transparent;z-index:2;display:grid;place-items:center}
+.steps-path-mount .sp-marker-face{width:30px;height:30px;display:grid;place-items:center;flex:none;line-height:1}
+.steps-path-mount .sp-knob{top:50%;z-index:3;display:grid;place-items:center}
+.steps-path-mount .sp-knob-face{width:30px;height:30px;border-radius:50%;background:var(--primary);color:var(--sp-primary-foreground);border:2px solid var(--sp-card);display:grid;place-items:center;font-size:12px;font-weight:750;line-height:1;box-sizing:border-box}
+.steps-path-mount .sp-cards{height:260px;overflow:hidden;isolation:isolate}
+.steps-path-mount .sp-card{width:min(100%,560px);height:100%;margin:0;box-sizing:border-box}
+.steps-path-mount .sp-card-body{height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
+.steps-path-mount .sp-card-heading{min-height:44px;align-items:center}
+.steps-path-mount .sp-card-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center}
+.steps-path-mount .sp-card-icon svg{width:24px;height:24px;display:block;flex:none}
+@media(max-width:767px){
+ .steps-path-mount .sp-track{margin-inline:20px;height:56px}
+ .steps-path-mount .sp-cards{height:clamp(255px,75vw,320px)}
+ .steps-path-mount .sp-marker{width:36px;height:36px}
+ .steps-path-mount .sp-marker-face,.steps-path-mount .sp-knob-face{width:28px;height:28px}
+ .steps-path-mount .sp-card-body{justify-content:flex-start;padding-top:24px}
+}
