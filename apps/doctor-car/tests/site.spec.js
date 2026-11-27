@@ -10,6 +10,8 @@ test('hero and real-service contacts with honest demo attribution',async({page})
  await expect(page.getByRole('link',{name:/Позвонить/}).last()).toHaveAttribute('href','tel:+79586092157');
  await expect(page.locator('.hero-car')).toHaveAttribute('alt',/не фото автосервиса/);
  await expect(page.locator('.float-diagnostics')).toBeVisible();
+ await expect(page.locator('.hero .overline')).toContainText('ЖЛОБЫ, 50');
+ await expect(page.locator('.hero .overline')).not.toContainText('ЖЛОБЫ, 24');
  expect(errors).toEqual([]);
 });
 test('theme switch persists and mixed light/dark editorial bands exist',async({page})=>{
