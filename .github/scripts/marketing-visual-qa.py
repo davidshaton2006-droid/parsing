@@ -23,7 +23,9 @@ def assert_steps_alignment(page, stage):
         if(!track||!knob||!marker) return false;
         const center=e=>{const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]};
         const [x,y]=center(knob),[mx,my]=center(marker);
-        return Math.abs(x-mx)<1.5 && Math.abs(y-my)<1.5;
+        const cards=document.querySelector('[data-sp-cards]'),active=cards?.querySelector('.sp-card[aria-hidden=false]');
+        if(!active||knob.querySelector('[role=slider]')?.getAttribute('aria-valuenow')!==String(stage))return false;
+        return Math.abs(x-mx)<1 && Math.abs(y-my)<1 && Math.abs(center(active)[0]-center(cards)[0])<1.5;
     }""",arg=stage,timeout=6000)
     result=page.locator('[data-steps-path]').evaluate("""(e)=>{
         const center=n=>{const b=n.getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height/2}};
