@@ -17,6 +17,32 @@ def assert_page(condition, label):
     if not condition:
         raise AssertionError(label)
 
+def assert_steps_alignment(page, stage):
+    page.wait_for_function("""stage => {
+        const track=document.querySelector('[data-sp-track]'), knob=document.querySelector('[data-sp-knob]'), marker=document.querySelector('[data-sp-marker="'+stage+'"]');
+        if(!track||!knob||!marker) return false;
+        const center=e=>{const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]};
+        const [x,y]=center(knob),[mx,my]=center(marker);
+        return Math.abs(x-mx)<1.5 && Math.abs(y-my)<1.5;
+    }""",arg=stage,timeout=6000)
+    result=page.locator('[data-steps-path]').evaluate("""(e)=>{
+        const center=n=>{const b=n.getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height/2}};
+        const markers=[...e.querySelectorAll('[data-sp-marker]')].map(center);
+        const gaps=markers.slice(1).map((m,i)=>m.x-markers[i].x);
+        const stage=e.querySelector('[data-sp-cards]').getBoundingClientRect();
+        const card=e.querySelector('.sp-card[aria-hidden=false]').getBoundingClientRect();
+        const icon=e.querySelector('.sp-card[aria-hidden=false] .sp-card-icon').getBoundingClientRect();
+        return {aligned:markers.every(m=>Math.abs(m.y-markers[0].y)<1),
+          equal:Math.max(...gaps)-Math.min(...gaps)<1.5, minGap:Math.min(...gaps),
+          centered:Math.abs((card.left+card.width/2)-(stage.left+stage.width/2))<2,
+          iconSize:[icon.width,icon.height], iconOffset:Math.round(icon.top-card.top),
+          cardFits:card.left>=stage.left-2 && card.right<=stage.right+2};
+    }""")
+    assert_page(result["aligned"] and result["equal"] and result["minGap"]>=35, "step markers must remain evenly spaced: "+str(result))
+    assert_page(result["centered"] and result["cardFits"], "active card centered: "+str(result))
+    assert_page(result["iconSize"]==[44,44], "stable card icon size")
+    return result["iconOffset"]
+
 with TemporaryDirectory() as temp:
     (Path(temp) / "parsing").symlink_to(ROOT, target_is_directory=True)
     server = ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=temp))
@@ -166,13 +192,16 @@ with TemporaryDirectory() as temp:
                                 slider = path.get_by_role("slider")
                                 assert_page(path.locator('button[aria-label^="Перейти к этапу"]').count()==6, "six project steps")
                                 assert_page(not path.evaluate("(e)=>e.classList.contains('dark')"),"light default")
+                                icon_offset=assert_steps_alignment(page,1)
                                 path.get_by_role("button",name="Перейти к этапу 5: Запуск").click()
                                 page.wait_for_function("document.querySelector('[data-steps-path] [role=slider]').getAttribute('aria-valuenow')==='5'")
                                 assert_page(path.locator('li[aria-hidden=false] h3').inner_text()=="Запуск","project timeline")
+                                assert_page(assert_steps_alignment(page,5)==icon_offset,"card icons share the same vertical offset")
                                 slider.focus()
                                 slider.press("End")
                                 page.wait_for_function("document.querySelector('[data-steps-path] [role=slider]').getAttribute('aria-valuenow')==='6'")
                                 assert_page(path.locator('li[aria-hidden=false] h3').inner_text()=="Развитие","sixth stage")
+                                assert_page(assert_steps_alignment(page,6)==icon_offset,"sixth icon alignment")
                                 path.get_by_role("button",name="Сначала").click()
                                 page.wait_for_function("document.querySelector('[data-steps-path] [role=slider]').getAttribute('aria-valuenow')==='1'")
                                 path.get_by_role("button",name="Тёмная тема").click()
@@ -276,6 +305,28 @@ with TemporaryDirectory() as temp:
                         assert_page(scene.locator("img.reference-object-art").count()==0, "static art hides animated interface")
                     assert_page(page.locator(".motion-approach").count()==3, "distinct approach scenes")
                     page.locator(".motion-approach").first.screenshot(path=str(OUT / f"motion-approach-{width}.png"), animations="disabled")
+                    # Exercise real spring animation, dragging and resizing without changing the active step.
+                    steps_path=page.locator('[data-steps-path]')
+                    steps_path.scroll_into_view_if_needed()
+                    offset=assert_steps_alignment(page,1)
+                    for stage in (2,4,6):
+                        steps_path.locator(f'[data-sp-marker="{stage}"]').click()
+                        assert_page(assert_steps_alignment(page,stage)==offset,"stable icons after animated transition")
+                    resized=375 if width==1440 else 1024
+                    page.set_viewport_size({"width":resized,"height":900})
+                    assert_steps_alignment(page,6)
+                    page.set_viewport_size({"width":width,"height":900})
+                    assert_steps_alignment(page,6)
+                    knob=steps_path.get_by_role("slider")
+                    knob.scroll_into_view_if_needed()
+                    k=knob.bounding_box()
+                    mark=steps_path.locator('[data-sp-marker="3"]').bounding_box()
+                    page.mouse.move(k["x"]+k["width"]/2,k["y"]+k["height"]/2)
+                    page.mouse.down()
+                    page.mouse.move(mark["x"]+mark["width"]/2,mark["y"]+mark["height"]/2,steps=14)
+                    page.mouse.up()
+                    assert_steps_alignment(page,3)
+                    steps_path.screenshot(path=str(OUT/f"steps-aligned-motion-{width}.png"),animations="disabled")
                     # Test pointer light and the independently rendered border without intercepting input.
                     if width==1440:
                         card=page.locator(".service-bento > .tile").first

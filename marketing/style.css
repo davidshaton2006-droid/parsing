@@ -713,7 +713,7 @@ html:has(.liquid-glass-nav){scroll-padding-top:126px}
 .steps-path-mount .sp-knob-face{width:30px;height:30px;border-radius:50%;background:var(--primary);color:var(--sp-primary-foreground);border:2px solid var(--sp-card);display:grid;place-items:center;font-size:12px;font-weight:750;line-height:1;box-sizing:border-box}
 .steps-path-mount .sp-cards{height:260px;overflow:hidden;isolation:isolate}
 .steps-path-mount .sp-card{width:min(100%,560px);height:100%;margin:0;box-sizing:border-box}
-.steps-path-mount .sp-card-body{height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
+.steps-path-mount .sp-card-body{height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start}
 .steps-path-mount .sp-card-heading{min-height:44px;align-items:center}
 .steps-path-mount .sp-card-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center}
 .steps-path-mount .sp-card-icon svg{width:24px;height:24px;display:block;flex:none}
