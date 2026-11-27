@@ -1,6 +1,6 @@
 "use client"
 import * as React from "react"
-import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform, type MotionValue } from "motion/react"
+import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform } from "motion/react"
 import { ArrowLeft, ArrowRight, Check, Moon, Pause, Play, RotateCcw, Sun } from "lucide-react"
 import { cn } from "../../lib/utils"
 
@@ -29,13 +29,9 @@ export interface StepsPathProps {
 const GOLD = "var(--sp-gold)"
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 
-function StepCard({ s, i, pos, reduce, active, total }: { s: PathStep; i: number; pos: MotionValue<number>; reduce: boolean; active: boolean; total: number }) {
-  const d = useTransform(pos, (p) => i - p)
-  const x = useTransform(d, (v) => `${v * 105 - 50}%`)
-  const opacity = useTransform(d, (v) => Math.max(0, 1 - Math.abs(v) * (reduce ? 1 : 0.65)))
-  const zi = useTransform(d, (v) => 100 - Math.round(Math.abs(v) * 10))
+function StepCard({ s, i, reduce, active, total }: { s: PathStep; i: number; reduce: boolean; active: boolean; total: number }) {
   return (
-    <motion.li aria-hidden={!active} aria-roledescription="slide" aria-label={`Этап ${i + 1} из ${total}: ${s.title}`} className="sp-card absolute left-1/2 top-0 list-none" style={{ x, opacity, zIndex: zi }}>
+    <motion.li aria-hidden={!active} aria-roledescription="slide" aria-label={`Этап ${i + 1} из ${total}: ${s.title}`} className="sp-card absolute top-0 list-none" initial={false} animate={{ opacity: active ? 1 : 0 }} transition={{ duration: reduce ? 0 : 0.18 }} style={{ visibility: active ? "visible" : "hidden", zIndex: active ? 2 : 1 }}>
       <div className="sp-card-body relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-[0_26px_44px_-28px_color-mix(in_oklab,var(--primary)_75%,transparent)]">
         <motion.span aria-hidden className="pointer-events-none absolute -right-2 -top-6 select-none text-[120px] font-black leading-none tracking-tighter text-primary/10">{i + 1}</motion.span>
         <div className="sp-card-heading relative flex items-center gap-3">
@@ -99,7 +95,7 @@ export function StepsPath({ steps, title = "Этапы проекта", defaultS
     const d = drag.current; if (!d) return
     let next: number
     if (d.kind === "knob") { const b = box.current!.getBoundingClientRect(); next = ((e.clientX - b.left) / Math.max(1,b.width)) * last }
-    else { const card = (e.currentTarget as HTMLElement).querySelector(".sp-card"); const width = card ? card.getBoundingClientRect().width : 280; next = d.p - (e.clientX - d.x) / Math.max(1,width * 1.05) }
+    else { const card = (e.currentTarget as HTMLElement).querySelector(".sp-card[aria-hidden=false]"); const width = card ? card.getBoundingClientRect().width : 280; next = d.p - (e.clientX - d.x) / Math.max(1,width * 0.55) }
     const now = performance.now(); const cur = pos.get(); d.v = (next - cur) / Math.max(1, now - d.t) * 1000; d.t = now
     pos.set(clamp(next, 0, n - 1))
   }
@@ -149,7 +145,7 @@ export function StepsPath({ steps, title = "Этапы проекта", defaultS
         </div>
 
         <div onPointerDown={begin("card")} onPointerMove={move} onPointerUp={end} onPointerCancel={end} data-sp-cards className="sp-cards relative mt-2 touch-pan-y cursor-grab select-none active:cursor-grabbing">
-          <ul className="relative h-full">{steps.map((s, i) => <StepCard key={s.id} s={s} i={i} pos={pos} reduce={reduce} active={i === step} total={n} />)}</ul>
+          <ul className="relative h-full">{steps.map((s, i) => <StepCard key={s.id} s={s} i={i} reduce={reduce} active={i === step} total={n} />)}</ul>
         </div>
 
         <div className="relative mt-3 flex items-center justify-between gap-2 sm:gap-3">

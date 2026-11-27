@@ -724,3 +724,7 @@ html:has(.liquid-glass-nav){scroll-padding-top:126px}
  .steps-path-mount .sp-marker-face,.steps-path-mount .sp-knob-face{width:28px;height:28px}
  .steps-path-mount .sp-card-body{justify-content:flex-start;padding-top:24px}
 }
+
+/* The card is centered by layout, not by a spring transform. Only opacity is animated. */
+.steps-path-mount .sp-card{left:0;right:0;margin-inline:auto;transform:none!important}
+.steps-path-mount .sp-card[aria-hidden=true]{visibility:hidden;pointer-events:none}
