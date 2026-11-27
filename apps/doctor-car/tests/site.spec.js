@@ -74,3 +74,17 @@ test('essential company information remains accessible without JS',async({browse
  await expect(page.getByRole('link',{name:/Открыть маршрут/})).toHaveAttribute('href',/114732639406/);
  await page.close();
 });
+
+test('car photo is not covered by interactive cards on small screens',async({page},testInfo)=>{
+ if(testInfo.project.name!=='mobile')return;
+ await page.goto(base);
+ const r=await page.evaluate(()=>{
+  const car=document.querySelector('.hero-image-wrap').getBoundingClientRect();
+  const panel=document.querySelector('.float-diagnostics').getBoundingClientRect();
+  const stage=document.querySelector('.hero-stage').getBoundingClientRect();
+  return {carBottom:car.bottom,panelTop:panel.top,stageHeight:stage.height};
+ });
+ expect(r.panelTop).toBeGreaterThanOrEqual(r.carBottom-3);
+ expect(r.stageHeight).toBeGreaterThan(400);
+ await expect(page.locator('.hero-car')).toBeVisible();
+});

@@ -499,3 +499,28 @@ svg{flex-shrink:0}
  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
  html{scroll-behavior:auto}
 }
+
+
+/* Visual QA / 28 Nov: keep the car fully legible on phones and blend studio photo edges. */
+.hero-car{mix-blend-mode:lighten}
+@media(max-width:760px){
+ .hero-stage{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;gap:10px;height:auto!important;min-height:0!important;padding:2px 0 19px}
+ .hero-image-wrap{position:relative!important;inset:auto!important;grid-column:1/-1;grid-row:1;min-height:0!important;height:258px!important;width:100%;margin:0!important;overflow:hidden;mask-image:linear-gradient(to bottom,#000 0%,#000 70%,transparent 98%)}
+ .hero-image-wrap:after{background:linear-gradient(to bottom,transparent 45%,#090a0c 99%)}
+ .hero-car{width:100%;height:100%;object-fit:contain;object-position:center}
+ .float-card{position:relative!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;transform:none!important;min-width:0;z-index:4}
+ .float-diagnostics{grid-column:1;grid-row:2;min-height:196px;padding:13px}
+ .float-service{grid-column:2;grid-row:2;min-height:196px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:13px}
+ .float-service button{margin-top:auto}
+ .float-systems{grid-column:1/-1;grid-row:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:12px}
+ .float-systems>span{grid-column:1/-1}
+ .float-systems button{min-width:0;font-size:10px;padding:9px 2px}
+ .hero-aside{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;grid-column:1/-1;grid-row:4;max-width:none!important;line-height:1.5;font-size:7px;padding:3px 0 0}
+}
+@media(max-width:430px){
+ .hero-image-wrap{height:235px!important}
+ .float-diagnostics,.float-service{min-height:189px}
+ .float-diagnostics .float-head{font-size:7px}
+ .float-options button{font-size:9px}
+ .float-systems button{font-size:9px}
+}
